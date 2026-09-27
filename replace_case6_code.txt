@@ -1,0 +1,95 @@
+case 6:
+        return (
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <h4 className="font-black text-amber-500 uppercase tracking-widest text-sm mb-4">Deine Mission: Emotionale Blockade lösen (Gibbs-Zyklus)</h4>
+            </div>
+
+            <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+              <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-black flex items-center justify-center shrink-0">1</div>
+              <div className="pt-1 w-full">
+                <p className="text-slate-200 font-bold text-sm mb-4">Einführung & Video (Der Ursprung in der Onkologie)</p>
+                <p className="text-slate-300 text-sm mb-4">
+                  Sarahs Weg zur professionellen Reflexion begann nicht erst hier im Haus. Schau dir zunächst das folgende Video an. Es zeigt Sarah während ihres Akuteinsatzes auf der Onkologie, wo sie erstmals mit dem Tod konfrontiert wurde, und erklärt, wie der Gibbs-Zyklus theoretisch auf ihre damalige Situation angewendet wird. Behalte diese Vorgeschichte im Hinterkopf, denn sie holt Sarah heute wieder ein.
+                </p>
+                <div className="aspect-video bg-black rounded-xl overflow-hidden border border-slate-700 shadow-lg mb-4">
+                  <iframe src="https://archive.org/embed/der-emotionale-block-sarah/Der_emotionale_Block_Sarah.mp4" className="w-full h-full" allowFullScreen></iframe>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+              <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-900 font-black flex items-center justify-center shrink-0 z-10">2</div>
+              <div className="w-full z-10">
+                <p className="text-slate-200 font-bold text-sm mb-4">Die neue Fallvignette (Der Trigger im Altenheim)</p>
+                <div className="bg-slate-800 p-5 rounded-xl border-l-4 border-l-blue-500 shadow-md">
+                  <p className="text-slate-300 text-sm leading-relaxed mb-4">
+                    Ein halbes Jahr ist seit dem Vorfall in der Onkologie vergangen. Sarah ist nun im Einsatz bei euch im Altenheim. Sie gilt als belastbar und routiniert.<br/><br/>
+                    Heute Vormittag ist Frau Wagner, eine Bewohnerin, die Sarah in den letzten Wochen intensiv betreut hat, völlig unerwartet verstorben.
+                  </p>
+                  <p className="text-slate-300 text-sm leading-relaxed mb-4">
+                    <strong className="text-amber-400">Das Problem:</strong> Anstatt Trauer oder Überforderung zu zeigen, verfällt Sarah in einen fast roboterhaften Aktionismus. Sie beginnt unaufgefordert, das Zimmer auszuräumen. Als du sie behutsam ansprichst, blockt sie professionell, aber unterkühlt ab: "Alles gut, ich kenne das ja schon aus dem Krankenhaus. Das gehört in unserem Beruf halt dazu. Wir müssen jetzt weiterarbeiten, auf Zimmer 12 klingelt es."
+                  </p>
+                  <p className="text-slate-300 text-sm leading-relaxed mb-4">
+                    <strong className="text-amber-400">Die didaktische Hürde:</strong> Du erkennst sofort: Die Situation im Altenheim wirkt als Trigger für das unbewältigte Erlebnis aus der Onkologie. Sarah nutzt 'Rationalisierung' als massiven Schutzmechanismus. Würdest du sie jetzt zu einem spontanen Reflexionsgespräch zwingen, würde sie aus Überforderung komplett blockieren. Sie braucht einen geschützten Raum und Struktur.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+              <div className="w-8 h-8 rounded-full bg-emerald-500 text-slate-900 font-black flex items-center justify-center shrink-0 z-10">3</div>
+              <div className="w-full z-10">
+                <h4 className="font-bold text-white mb-2">Der Arbeitsauftrag (Das Azubi-Board)</h4>
+                <p className="text-sm text-slate-300 mb-4">
+                  Wir nutzen den Gibbs-Zyklus hier als asynchrone Vorbereitungsaufgabe (Scaffolding). Sarah soll sich mit Hilfe der 6 Phasen sortieren können, bevor ihr euch zum Gespräch trefft.
+                </p>
+                <div className="bg-slate-800 p-4 rounded-lg border border-slate-700 mb-4">
+                  <strong className="text-white block mb-2">Dein Auftrag für das fobizz Azubi-Board:</strong>
+                  <ul className="list-disc pl-5 text-sm text-slate-300 space-y-2">
+                    <li>Es reicht nicht, einfach nur die 6 Fragen hinzuklatschen! Verfasse einen wertschätzenden Einleitungstext für Sarah.</li>
+                    <li>Mache das Ziel transparent: Warum soll sie diese Fragen beantworten? Nimm ihr den Druck (es ist keine Prüfung!).</li>
+                    <li>Biete ihr an, sich jederzeit vorab melden zu können.</li>
+                    <li>Füge dann die 6 Leitfragen des Gibbs-Zyklus (siehe Methodenkoffer) als Strukturhilfe an.</li>
+                  </ul>
+                </div>
+                {renderBoard("https://app.fobizz.com/pinboard/public_boards/cbb73434-0114-4ee8-853d-31788b459d34?embed=true&token=b0cbca55223b034ebf4f4d6038851b70", "fobizz Azubi-Board")}
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+              <div className="w-8 h-8 rounded-full bg-purple-500 text-white font-black flex items-center justify-center shrink-0">4</div>
+              <div className="pt-1 w-full">
+                <h4 className="font-bold text-white mb-2">Die detaillierte Musterlösung</h4>
+                <p className="text-sm text-slate-300 mb-4">Abgleich, wie der perfekte, wertschätzende Post an Sarah aussehen sollte.</p>
+                {!showSolution ? (
+                  <button onClick={() => setShowSolution(true)} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-bold transition-colors">
+                    Musterlösung anzeigen
+                  </button>
+                ) : (
+                  <div className="bg-slate-950 border-2 border-emerald-500/50 p-6 rounded-xl animate-in fade-in slide-in-from-top-2">
+                    <h5 className="font-black text-emerald-500 mb-4 uppercase tracking-widest text-sm">Beispiellösung für das fobizz Azubi-Board (Gibbs-Zyklus)</h5>
+                    <div className="space-y-4">
+                      <p className="text-slate-300 text-sm italic border-b border-slate-800 pb-4">
+                        "Liebe Sarah, der heutige Vormittag und der plötzliche Tod von Frau Wagner waren extrem belastend. Mir ist wichtig, dass du das nicht einfach wegschiebst, auch wenn du solche Situationen schon aus dem Krankenhaus kennst.<br/><br/>
+                        Bitte nimm dir heute im Laufe des Dienstes (oder zu Hause) 15 Minuten Zeit nur für dich. Nutze die folgenden 6 Fragen, um das Erlebte für dich zu sortieren – völlig ohne Druck, es gibt hier kein Richtig oder Falsch. Wir setzen uns morgen bei einem Kaffee zusammen und besprechen das in Ruhe. Wenn du vorher reden möchtest, ruf mich jederzeit an!"
+                      </p>
+                      <ul className="space-y-3 pt-2">
+                        <li><strong className="text-white text-sm">Zur Vorbereitung für dich:</strong></li>
+                        <li><strong className="text-white text-sm">Beschreibung:</strong> <span className="text-slate-300 text-sm">Was ist heute Vormittag aus deiner Sicht genau passiert?</span></li>
+                        <li><strong className="text-white text-sm">Gefühle:</strong> <span className="text-slate-300 text-sm">Was ging dir in dem Moment durch den Kopf und was hast du gefühlt?</span></li>
+                        <li><strong className="text-white text-sm">Auswertung:</strong> <span className="text-slate-300 text-sm">Was hat dir heute geholfen (was war gut) und was war besonders schwer (was war schlecht)?</span></li>
+                        <li><strong className="text-white text-sm">Analyse:</strong> <span className="text-slate-300 text-sm">Warum reagierst du aktuell so, wie du reagierst? (Welche Rolle spielt deine Erfahrung aus dem Krankenhaus dabei?)</span></li>
+                        <li><strong className="text-white text-sm">Schlussfolgerung:</strong> <span className="text-slate-300 text-sm">Was hättest du rückblickend heute von mir oder dem Team gebraucht?</span></li>
+                        <li><strong className="text-white text-sm">Aktionsplan:</strong> <span className="text-slate-300 text-sm">Was nimmst du aus dieser Situation für deinen eigenen Selbstschutz in der Zukunft mit?</span></li>
+                      </ul>
+                    </div>
+                    <button onClick={() => setShowSolution(false)} className="text-slate-400 hover:text-slate-300 text-sm mt-4 font-bold">Ausblenden</button>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {renderDocumentationStep(5, 'Sarah')}
+          </div>
+        );
