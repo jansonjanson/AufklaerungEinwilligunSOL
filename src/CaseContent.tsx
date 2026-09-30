@@ -23,8 +23,8 @@ export const CASES = [
   { id: 1, roomId: 'anmeldung', title: 'Akte 01: Rechtliche Aspekte der Aufklärung', tag: 'Grundlagen & BGB', subtitle: 'Leseauftrag, BGB-Auszug & die 3 wichtigsten Erkenntnisse.' },
   { id: 2, roomId: 'anmeldung', title: 'Akte 02: Patientenaufklärung in der Praxis (Videos)', tag: 'Praxis-Videos', subtitle: 'Selbstbestimmungs- vs. Sicherungsaufklärung mit Prof. Frohnhofen.' },
   { id: 3, roomId: 'patientenzimmer', title: 'Akte 03: Die Prämedikation (Fallvignette)', tag: 'Fallanwendung', subtitle: 'Herr Yilmaz (65) in der OP-Schleuse: Wirksamkeit der Einwilligung.' },
-  { id: 4, roomId: 'patientenzimmer', title: 'Akte 04: Formen der Einwilligung (Mini-Fälle)', tag: 'Einwilligungsformen', subtitle: 'Konkludent, mutmaßlich, ausdrücklich oder Aufklärungsverzicht?' },
-  { id: 5, roomId: 'stationszimmer', title: 'Akte 05: Das große Jura-Quiz', tag: 'Jura-Check', subtitle: 'Körperverletzung, Einwilligungsformen & Geschäftsfähigkeit.' },
+  { id: 4, roomId: 'patientenzimmer', title: 'Akte 04: Formen der Einwilligung (Mini-Fälle)', tag: 'Einwilligungsformen', subtitle: 'Konkludent, mutmaßlich, ausdrücklich oder hypothetisch?' },
+  { id: 5, roomId: 'stationszimmer', title: 'Akte 05: Das große Jura-Quiz', tag: 'Jura-Check', subtitle: 'Körperverletzung, Lückentext & Beweislast (§ 630h BGB).' },
   { id: 6, roomId: 'stationszimmer', title: 'Akte 06: Die Grenzen der Delegation', tag: 'Delegationsrecht', subtitle: 'Was darf die Pflege? Vorbehaltsaufgaben vs. Arztvorbehalt.' },
   { id: 7, roomId: 'arztzimmer', title: 'Akte 07: Das Eskalationsmodell (Willensermittlung)', tag: 'Eskalationsmodell', subtitle: 'Stufenprozess bei bewusstlosen Patient:innen ordnen.' },
   { id: 8, roomId: 'arztzimmer', title: 'Akte 08: KI-Labor & Remonstration', tag: 'Recht & KI-Labor', subtitle: 'Fall Herr Chen: Sokratischer Dialog & rechtssichere Dokumentation.' },
@@ -130,31 +130,6 @@ const CopyBlock = ({ title, content, titleColor = "text-blue-400" }: any) => {
   );
 };
 
-const MusterloesungToggle = ({ title = "Musterlösung anzeigen", children, defaultOpen = false }: { title?: string, children: React.ReactNode, defaultOpen?: boolean }) => {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div className="my-4 bg-emerald-950/20 border border-emerald-500/40 rounded-xl overflow-hidden transition-all shadow-sm">
-      <button 
-        onClick={() => setOpen(!open)}
-        className="w-full p-4 flex items-center justify-between text-left bg-emerald-900/20 hover:bg-emerald-900/30 transition-colors"
-      >
-        <div className="flex items-center gap-2.5">
-          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-          <span className="font-bold text-emerald-300 text-sm">{title}</span>
-        </div>
-        <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider bg-emerald-500/20 px-3 py-1 rounded-md flex items-center gap-1">
-          {open ? <><ChevronUp className="w-3.5 h-3.5" /> Ausblenden</> : <><ChevronDown className="w-3.5 h-3.5" /> Einblenden</>}
-        </span>
-      </button>
-      {open && (
-        <div className="p-4 sm:p-5 border-t border-emerald-500/30 text-xs sm:text-sm text-slate-200 leading-relaxed space-y-3 bg-slate-900/80 animate-in fade-in">
-          {children}
-        </div>
-      )}
-    </div>
-  );
-};
-
 const VideoPlayerBlock = ({ title, youtubeId, subtitle, linkUrl }: { title: string, youtubeId: string, subtitle?: string, linkUrl: string }) => {
   return (
     <div className="bg-slate-900 border border-slate-700/80 rounded-2xl overflow-hidden shadow-xl mb-6">
@@ -217,7 +192,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
   // Case 5 states (Quiz)
   const [case5Q1, setCase5Q1] = useState<string | null>(null);
   const [case5Q2, setCase5Q2] = useState<{ [key: string]: boolean }>({ A: false, B: false, C: false, D: false, E: false });
-  const [case5Q3, setCase5Q3] = useState<boolean | null>(null);
+  const [case5Q3Text, setCase5Q3Text] = useState(() => localStorage.getItem('praxis-c5-q3text') || '');
   const [case5Q4, setCase5Q4] = useState<string | null>(null);
   const [case5Submitted, setCase5Submitted] = useState(false);
   const [case5Passed, setCase5Passed] = useState(false);
@@ -249,6 +224,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
   useEffect(() => { localStorage.setItem('praxis-c4-s2', case4S2); }, [case4S2]);
   useEffect(() => { localStorage.setItem('praxis-c4-s3', case4S3); }, [case4S3]);
   useEffect(() => { localStorage.setItem('praxis-c4-s4', case4S4); }, [case4S4]);
+  useEffect(() => { localStorage.setItem('praxis-c5-q3text', case5Q3Text); }, [case5Q3Text]);
   useEffect(() => { localStorage.setItem('praxis-c8-notes', case8Notes); }, [case8Notes]);
   useEffect(() => { localStorage.setItem('praxis-c9-analysis', case9Analysis); }, [case9Analysis]);
 
@@ -297,7 +273,8 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
   const evaluateCase5 = () => {
     const q1Correct = case5Q1 === 'B';
     const q2Correct = case5Q2.A === true && case5Q2.B === false && case5Q2.C === true && case5Q2.D === false && case5Q2.E === true;
-    const q3Correct = case5Q3 === false; // Falsch ist die richtige Antwort
+    const cleanQ3 = case5Q3Text.trim().toLowerCase();
+    const q3Correct = cleanQ3 === 'körperverletzung' || cleanQ3 === 'koerperverletzung' || cleanQ3.includes('körperverletzung') || cleanQ3.includes('koerperverletzung');
     const q4Correct = case5Q4 === 'B';
 
     const allCorrect = q1Correct && q2Correct && q3Correct && q4Correct;
@@ -500,6 +477,18 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
             linkUrl="https://youtu.be/dUTMy6FxXuU?si=DPZRasFGxlk4F8RM"
           />
 
+          {/* Video-Highlights Box */}
+          <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2 mb-6 shadow-md">
+            <h4 className="font-bold text-amber-400 text-sm flex items-center gap-2">
+              <span>💡</span> Wichtige Video-Kernzitate von Prof. Dr. Frohnhofen:
+            </h4>
+            <ul className="list-disc list-inside text-xs text-slate-300 space-y-1 leading-relaxed">
+              <li>Aufklärung basiert auf einer vertrauensvollen Beziehung und verlangt einen freien, unbeeinflussten Willen.</li>
+              <li>Bei elektiven Eingriffen muss eine klare räumliche und zeitliche Trennung zwischen Aufklärungsgespräch und OP-Beginn liegen.</li>
+              <li>Ein Aufklärungsverzicht des Patienten ist zulässig, muss jedoch zwingend in der Akte dokumentiert werden!</li>
+            </ul>
+          </div>
+
           {/* Arbeitsauftrag 2 */}
           <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4">
             <div>
@@ -665,9 +654,9 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
 
             <StyledTextarea 
               step="4"
-              label="Szenario 4: Verzicht auf Risikoaufklärung"
-              description="Ein Arzt beginnt mit der ausführlichen Risikoaufklärung. Der Patient unterbricht ihn: 'Bitte hören Sie auf, ich will die Horror-Risiken gar nicht wissen, operieren Sie einfach.' Darf der Arzt aufhören?"
-              placeholder="Rechtliche Einordnung und Dokumentationspflicht..."
+              label="Szenario 4: Gallengangverletzung & nachträgliche Rüge"
+              description="Ein Arzt klärt vor einer Gallen-OP nicht über das Risiko einer Gallengangverletzung auf. Die Komplikation tritt ein. Vor Gericht beruft sich der Arzt darauf, dass der Patient bei Kenntnis des Risikos wegen starker Schmerzen die OP dennoch hätte durchführen lassen. Welche Einwilligungsform meint er?"
+              placeholder="Welche besondere juristische Einwilligungsform / Einwand des Behandlers liegt hier vor?"
               value={case4S4}
               onChange={(e: any) => setCase4S4(e.target.value)}
               color="rose"
@@ -694,7 +683,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
                     <strong className="text-purple-400">Szenario 3:</strong> <strong>Ausdrückliche (meist schriftliche) Einwilligung</strong> nach rechtzeitiger Selbstbestimmungsaufklärung.
                   </li>
                   <li>
-                    <strong className="text-rose-400">Szenario 4:</strong> <strong>Aufklärungsverzicht.</strong> Ja, der Patient darf verzichten. <strong className="text-white">WICHTIG:</strong> Dies muss zur rechtlichen Absicherung zwingend dokumentiert werden!
+                    <strong className="text-rose-400">Szenario 4:</strong> <strong>Hypothetische Einwilligung</strong> (Einwand des Behandelnden nach § 630h Abs. 2 BGB; unterliegt vor Gericht sehr strengen Hürden!).
                   </li>
                 </ul>
               </div>
@@ -768,41 +757,32 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
               </div>
             </div>
 
-            {/* Frage 3 */}
+            {/* Frage 3 (Lückentext) */}
             <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl space-y-3">
-              <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">Frage 3 (Richtig oder Falsch?): Einwilligungsfähigkeit vs. Geschäftsfähigkeit</span>
+              <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">Frage 3 (Lückentext): Tatbestand des Heileingriffs</span>
               <p className="text-sm font-bold text-white">
-                „Die Einwilligungsfähigkeit eines Patienten ist rechtlich absolut identisch mit seiner Geschäftsfähigkeit (ab 18 Jahren).“
+                „Jeder ärztliche Heileingriff erfüllt nach ständiger Rechtsprechung ohne wirksame Einwilligung zunächst den Straftatbestand der __________ (§ 223 StGB).“
               </p>
-              <div className="flex gap-3 text-xs sm:text-sm">
-                <button 
-                  type="button" 
-                  onClick={() => setCase5Q3(true)} 
-                  className={`flex-1 p-3 rounded-lg border font-bold transition-colors ${case5Q3 === true ? 'bg-purple-600 text-white border-purple-500' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'}`}
-                >
-                  Richtig
-                </button>
-                <button 
-                  type="button" 
-                  onClick={() => setCase5Q3(false)} 
-                  className={`flex-1 p-3 rounded-lg border font-bold transition-colors ${case5Q3 === false ? 'bg-purple-600 text-white border-purple-500' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'}`}
-                >
-                  Falsch
-                </button>
-              </div>
+              <input 
+                type="text"
+                value={case5Q3Text}
+                onChange={(e) => setCase5Q3Text(e.target.value)}
+                placeholder="Begriff eingeben (z.B. Körperverletzung)..."
+                className="w-full p-3 bg-slate-950 border border-slate-700 rounded-lg text-slate-200 focus:border-purple-500 outline-none text-sm shadow-inner"
+              />
             </div>
 
-            {/* Frage 4 */}
+            {/* Frage 4 (Beweislast) */}
             <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl space-y-3">
-              <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">Frage 4 (Single Choice): Zeitpunkt der Aufklärung</span>
+              <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">Frage 4 (Single Choice): Beweislast nach § 630h BGB</span>
               <p className="text-sm font-bold text-white">
-                Wann muss die Aufklärung bei einem größeren, elektiven operativen Eingriff spätestens erfolgen?
+                Wer trägt nach § 630h BGB in einem Zivilprozess die Beweislast dafür, dass ordnungsgemäß und rechtzeitig aufgeklärt wurde?
               </p>
               <div className="space-y-2 text-xs sm:text-sm">
                 {[
-                  { id: 'A', text: 'Unmittelbar auf dem Weg in den OP, solange der Patient noch wach ist.' },
-                  { id: 'B', text: 'Am Vorabend oder im Idealfall mit einem zeitlichen Vorlauf von mindestens 24 Stunden, damit ausreichend Bedenkzeit verbleibt.' },
-                  { id: 'C', text: 'Nach Einleitung der Narkose.' }
+                  { id: 'A', text: 'Der Patient' },
+                  { id: 'B', text: 'Die Behandlerseite (Arzt / Klinik)' },
+                  { id: 'C', text: 'Die Krankenkasse' }
                 ].map((opt) => (
                   <label key={opt.id} className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${case5Q4 === opt.id ? 'bg-purple-950/40 border-purple-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'}`}>
                     <input 
@@ -838,7 +818,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
                     <div>
-                      <strong>Noch nicht ganz korrekt.</strong> Bitte überprüfen Sie Ihre Antworten (Tipp: Frage 2 hat 3 richtige Antworten, Frage 3 ist FALSCH, da Einwilligungsfähigkeit auf natürlicher Urteilskraft beruht).
+                      <strong>Noch nicht ganz korrekt.</strong> Bitte überprüfen Sie Ihre Antworten (Tipp: Frage 2 hat 3 richtige Antworten, Frage 3 ist "Körperverletzung", Frage 4 = Behandlerseite).
                     </div>
                   </div>
                 )}
@@ -946,9 +926,9 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
                 >
                   <option value="">-- Stufe auswählen --</option>
                   <option value="mutmasslich">Mutmaßlicher Wille (Ethische Abwägung)</option>
+                  <option value="notfall">Notfallindikation / Vitalgefahr (Sofortiges Handeln)</option>
+                  <option value="betreuer">Gesetzlicher Betreuer / Bevollmächtigter</option>
                   <option value="verfuegung">Suche nach Patientenverfügung</option>
-                  <option value="notfall">Notfallindikation (Sofortiges Handeln bei Lebensgefahr)</option>
-                  <option value="betreuer">Gesetzlicher Betreuer / Vorsorgevollmacht</option>
                 </select>
               </div>
             ))}

@@ -180,55 +180,61 @@ export default function App() {
     if (id === 1 && !newNotes.includes('note_1')) {
       newNotes.push('note_1');
       unlockedSomething = true;
-      showAchievement('Neuer Eintrag im Notizbuch!', 'Grundlagen der Patientenaufklärung freigeschaltet.');
+      showAchievement('Juristisches Handwerkszeug erweitert!', '§ 223 StGB & § 630d BGB freigeschaltet.');
     }
     if (id === 2 && !newNotes.includes('note_2')) {
       newNotes.push('note_2');
       unlockedSomething = true;
-      showAchievement('Neuer Eintrag im Notizbuch!', 'Praxis-Videos & Aufklärungstypen freigeschaltet.');
+      showAchievement('Juristisches Handwerkszeug erweitert!', 'Aufklärungstypen freigeschaltet.');
     }
     if (id === 3) {
       if (!newNotes.includes('note_3')) newNotes.push('note_3');
       if (!newMeth.includes('aufklaerung')) {
         newMeth.push('aufklaerung');
-        showAchievement('Gesetzbuch erweitert!', '§ 630e BGB: Aufklärungspflichten freigeschaltet.');
       }
       unlockedSomething = true;
+      showAchievement('Juristisches Handwerkszeug erweitert!', 'Urteilskraft & Vorlauf freigeschaltet.');
     }
     if (id === 4) {
       if (!newNotes.includes('note_4')) newNotes.push('note_4');
       if (!newMeth.includes('consent')) {
         newMeth.push('consent');
-        showAchievement('Gesetzbuch erweitert!', 'Formen der wirksamen Einwilligung freigeschaltet.');
       }
+      unlockedSomething = true;
+      showAchievement('Juristisches Handwerkszeug erweitert!', 'Die 4 Einwilligungsformen freigeschaltet.');
+    }
+    if (id === 5) {
+      if (!newNotes.includes('note_5')) newNotes.push('note_5');
       unlockedSomething = true;
     }
     if (id === 6) {
       if (!newNotes.includes('note_6')) newNotes.push('note_6');
       if (!newMeth.includes('delegation')) {
         newMeth.push('delegation');
-        showAchievement('Gesetzbuch erweitert!', 'Grenzen der Delegation & § 4 PflBG freigeschaltet.');
       }
       unlockedSomething = true;
+      showAchievement('Juristisches Handwerkszeug erweitert!', 'Delegationsgrenzen & § 4 PflBG freigeschaltet.');
     }
-    if (id === 7 && !newMeth.includes('eskalation')) {
-      newMeth.push('eskalation');
+    if (id === 7) {
+      if (!newNotes.includes('note_7')) newNotes.push('note_7');
+      if (!newMeth.includes('eskalation')) {
+        newMeth.push('eskalation');
+      }
       unlockedSomething = true;
-      showAchievement('Gesetzbuch erweitert!', 'Das Eskalationsmodell der Willensermittlung freigeschaltet.');
+      showAchievement('Juristisches Handwerkszeug erweitert!', 'Das Remonstrationsverfahren freigeschaltet.');
     }
     if (id === 8) {
       if (!newNotes.includes('note_8')) newNotes.push('note_8');
       if (!newMeth.includes('remonstration')) {
         newMeth.push('remonstration');
-        showAchievement('Gesetzbuch erweitert!', 'Remonstrationsrecht & KI-Prompts freigeschaltet.');
       }
       unlockedSomething = true;
+      showAchievement('Juristisches Handwerkszeug erweitert!', 'KI-Masterprompts für die Praxis freigeschaltet.');
     }
     if (id === 9) {
       if (!newNotes.includes('note_9')) newNotes.push('note_9');
       if (!newMeth.includes('beweislast')) {
         newMeth.push('beweislast');
-        showAchievement('Gesetzbuch erweitert!', '§ 630h BGB: Beweislastumkehr freigeschaltet.');
       }
       unlockedSomething = true;
     }
@@ -248,7 +254,15 @@ export default function App() {
     if (!progress.includes(id)) {
       const newProgress = [...progress, id];
       setProgress(newProgress);
-      saveToLocalStorage(newProgress, unlockedMethods, unlockedNotes);
+      
+      let newNotes = [...unlockedNotes];
+      const noteKey = `note_${id}`;
+      if (!newNotes.includes(noteKey)) {
+        newNotes.push(noteKey);
+        setUnlockedNotes(newNotes);
+      }
+
+      saveToLocalStorage(newProgress, unlockedMethods, newNotes);
 
       if (newProgress.length === 9) {
         setTimeout(() => {
@@ -374,7 +388,7 @@ export default function App() {
             </button>
             
             <button onClick={() => setShowNotes(true)} className="px-3 py-2 sm:px-4 bg-amber-500 hover:bg-amber-400 text-slate-900 font-black rounded-lg shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all flex items-center gap-2 text-xs sm:text-sm uppercase tracking-wider">
-              <NotebookPen className="w-4 h-4" /> <span className="hidden sm:inline">Notizbuch</span>
+              <NotebookPen className="w-4 h-4" /> <span className="hidden sm:inline">Juristisches Handwerkszeug</span>
               {unlockedNotes.length > 0 && <span className="bg-slate-900 text-amber-500 text-[10px] px-1.5 py-0.5 rounded-full ml-1 font-bold">{unlockedNotes.length}</span>}
             </button>
           </div>
@@ -672,7 +686,7 @@ export default function App() {
               {tutorialStep === 1 && "Willkommen auf der chirurgischen Station!"}
               {tutorialStep === 2 && "Die Raumübersicht (Krankenhaus)"}
               {tutorialStep === 3 && "Akten & juristische Fälle"}
-              {tutorialStep === 4 && "Gesetzbuch, Notizen & KI-Helfer"}
+              {tutorialStep === 4 && "Gesetzbuch, Handwerkszeug & KI-Helfer"}
               {tutorialStep === 5 && "Speicherstände verwalten"}
               {tutorialStep === 6 && "Bereit für die Schicht?"}
             </h3>
@@ -681,7 +695,7 @@ export default function App() {
               {tutorialStep === 1 && "Ihre Schicht beginnt. Im Mittelpunkt des heutigen Skills-Lab-Trainings steht das Thema Aufklärung und Einwilligung. Sie werden lernen, wann ein Eingriff eine Körperverletzung darstellt, welche Einwilligungsformen es gibt und wo die strikten rechtlichen Grenzen zwischen ärztlichen und pflegerischen Aufgaben verlaufen. Klicken Sie auf die '01 Anmeldung', um Ihre ersten Arbeitsaufträge abzuholen."}
               {tutorialStep === 2 && "Links sehen Sie die Raumübersicht des Krankenhauses. Klicken Sie auf die Marker, um die Räume (01 Anmeldung, 02 Patientenzimmer, 03 Stationszimmer, 04 Arztzimmer) zu betreten."}
               {tutorialStep === 3 && "Rechts öffnet sich Ihre Aktenübersicht. Hier bearbeiten und lösen Sie die juristischen Fälle und Arbeitsaufträge."}
-              {tutorialStep === 4 && "Oben rechts finden Sie Ihre Nachschlagewerke: Das Notizbuch speichert Ihre Erkenntnisse, das Gesetzbuch liefert Ihnen das juristische Fachwissen (§§ 630 BGB ff.). Beides wird mit Ihrem Lernfortschritt erweitert!"}
+              {tutorialStep === 4 && "Oben rechts finden Sie Ihre Nachschlagewerke: Das Handwerkszeug speichert Ihre Erkenntnisse, das Gesetzbuch liefert Ihnen das juristische Fachwissen (§§ 630 BGB ff.). Beides wird mit Ihrem Lernfortschritt erweitert!"}
               {tutorialStep === 5 && "Ganz unten rechts können Sie in verschiedenen Speicherplätzen Ihren Fortschritt sichern, laden oder zurücksetzen."}
               {tutorialStep === 6 && "Falls Sie diese Einführung noch einmal ansehen möchten, klicken Sie auf das Info-Symbol oben rechts. Viel Erfolg beim rechtssicheren Lernen!"}
             </p>
@@ -718,14 +732,14 @@ export default function App() {
         </div>
       )}
 
-      {/* NOTIZBUCH MODAL */}
+      {/* JURISTISCHES HANDWERKSZEUG (NOTIZBUCH) MODAL */}
       {showNotes && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300">
           <div className="bg-slate-900 border-2 border-amber-500/60 rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl relative">
             <div className="p-5 border-b border-slate-800 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2.5">
                 <NotebookPen className="w-5 h-5 text-amber-400" />
-                <h3 id="notes-title" className="font-black text-white text-base uppercase tracking-wider">Ihr Juristisches Notizbuch</h3>
+                <h3 id="notes-title" className="font-black text-white text-base uppercase tracking-wider">Juristisches Handwerkszeug</h3>
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => handlePrintModal('notes-title', 'notes-content')} className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white" title="Drucken">
@@ -741,48 +755,80 @@ export default function App() {
               {unlockedNotes.length === 0 ? (
                 <div className="text-center p-8 border border-dashed border-slate-700 rounded-xl">
                   <BookOpen className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                  <p className="text-slate-400">Ihr Notizbuch ist noch leer.</p>
+                  <p className="text-slate-400">Ihr juristisches Handwerkszeug ist noch leer.</p>
                   <p className="text-slate-500 text-xs mt-1">Sammeln Sie rechtliche Erkenntnisse und Badges beim Bearbeiten der Akten.</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {unlockedNotes.includes('note_1') && (
                     <div className="bg-slate-950 p-4 rounded-xl border border-blue-500/30">
-                      <h4 className="font-bold text-blue-400 text-sm mb-1">Akte 01: Rechtliche Grundlagen der Aufklärung</h4>
+                      <h4 className="font-bold text-blue-400 text-sm mb-1">§ 223 StGB & § 630d BGB</h4>
                       <p className="text-slate-300 text-xs leading-relaxed">
-                        Jeder Heileingriff erfüllt tatbestandlich eine Körperverletzung (§ 223 StGB) und bedarf der wirksamen Einwilligung. Die Aufklärung muss mündlich durch den Arzt erfolgen (strikter Arztvorbehalt). Die Einwilligung erfordert Urteilskraft und Gemütsruhe.
+                        Jeder Heileingriff ist rechtlich eine Körperverletzung. Die Einwilligung des Patienten ist der zwingende Rechtfertigungsgrund.
                       </p>
                     </div>
                   )}
 
                   {unlockedNotes.includes('note_2') && (
                     <div className="bg-slate-950 p-4 rounded-xl border border-rose-500/30">
-                      <h4 className="font-bold text-rose-400 text-sm mb-1">Akte 02: Praxis-Videos & Aufklärungstypen</h4>
+                      <h4 className="font-bold text-rose-400 text-sm mb-1">Aufklärungstypen</h4>
                       <p className="text-slate-300 text-xs leading-relaxed">
-                        <strong>Selbstbestimmungsaufklärung:</strong> Diagnose, Risiken, Behandlungsalternativen – ausschließliche ärztliche Pflicht.<br />
-                        <strong>Sicherungsaufklärung:</strong> Therapiebegleitende Verhaltensregeln (z.B. Sturzprophylaxe, Diabetisches Fußsyndrom) – hohe Eigenverantwortung der Pflegefachkräfte.
+                        Selbstbestimmungsaufklärung (Arztvorbehalt: Risiken, Alternativen) vs. Sicherungsaufklärung (Pflegeverantwortung: Verhaltensregeln, z.B. Sturzprophylaxe).
                       </p>
                     </div>
                   )}
 
                   {unlockedNotes.includes('note_3') && (
                     <div className="bg-slate-950 p-4 rounded-xl border border-amber-500/30">
-                      <h4 className="font-bold text-amber-400 text-sm mb-1">Akte 03: Fallbewertung Prämedikation (Herr Yilmaz)</h4>
+                      <h4 className="font-bold text-amber-400 text-sm mb-1">Urteilskraft & Vorlauf</h4>
                       <p className="text-slate-300 text-xs leading-relaxed">
-                        Eine Aufklärung in der OP-Schleuse nach Verabreichung sedierender Medikamente ist rechtlich unwirksam (fehlende Urteilskraft & mangelnde Bedenkzeit). Folge: Der Eingriff ist mangels Einwilligung rechtswidrig.
+                        Eine Aufklärung unter Prämedikation oder kurz vor dem Eingriff in der OP-Schleuse ist unwirksam. Bei elektiven Eingriffen müssen idealerweise 24h Bedenkzeit verbleiben.
                       </p>
                     </div>
                   )}
 
                   {unlockedNotes.includes('note_4') && (
                     <div className="bg-slate-950 p-4 rounded-xl border border-purple-500/30">
-                      <h4 className="font-bold text-purple-400 text-sm mb-1">Akte 04: Die 4 Formen der Einwilligung</h4>
-                      <ul className="list-disc list-inside text-xs text-slate-300 space-y-1 mt-1">
-                        <li><strong>Konkludent:</strong> Schlüssiges Verhalten (z.B. Arm hinhalten bei Blutentnahme).</li>
-                        <li><strong>Mutmaßlich:</strong> Bei unaufschiebbarer Notfallindikation / Bewusstlosigkeit.</li>
-                        <li><strong>Ausdrücklich:</strong> Mündlich oder schriftlich vor elektiven Eingriffen.</li>
-                        <li><strong>Aufklärungsverzicht:</strong> Zulässig, aber zwingend dokumentationspflichtig!</li>
-                      </ul>
+                      <h4 className="font-bold text-purple-400 text-sm mb-1">Die 4 Einwilligungsformen</h4>
+                      <p className="text-slate-300 text-xs leading-relaxed">
+                        1. Konkludent (schlüssiges Handeln, z.B. Arm hinhalten). 2. Ausdrücklich (meist schriftlich bei OP). 3. Mutmaßlich (Notfall). 4. Hypothetisch (Gerichtseinwand: Patient hätte ohnehin zugestimmt).
+                      </p>
+                    </div>
+                  )}
+
+                  {unlockedNotes.includes('note_5') && (
+                    <div className="bg-slate-950 p-4 rounded-xl border border-emerald-500/30">
+                      <h4 className="font-bold text-emerald-400 text-sm mb-1">§ 630h BGB (Beweislastumkehr)</h4>
+                      <p className="text-slate-300 text-xs leading-relaxed">
+                        In der Arzthaftung muss die Behandlerseite beweisen, dass lückenlos aufgeklärt wurde („Wer schreibt, der bleibt“). Fehlt die Dokumentation, gilt die Aufklärung als nicht erfolgt.
+                      </p>
+                    </div>
+                  )}
+
+                  {unlockedNotes.includes('note_6') && (
+                    <div className="bg-slate-950 p-4 rounded-xl border border-blue-500/30">
+                      <h4 className="font-bold text-blue-400 text-sm mb-1">Delegationsgrenzen & § 4 PflBG</h4>
+                      <p className="text-slate-300 text-xs leading-relaxed">
+                        Die Eingriffsaufklärung unterliegt einem absoluten Delegationsverbot. Die Feststellung des Pflegebedarfs ist hingegen eine eigenständige Vorbehaltsaufgabe der Pflege.
+                      </p>
+                    </div>
+                  )}
+
+                  {unlockedNotes.includes('note_7') && (
+                    <div className="bg-slate-950 p-4 rounded-xl border border-rose-500/30">
+                      <h4 className="font-bold text-rose-400 text-sm mb-1">Das Remonstrationsverfahren</h4>
+                      <p className="text-slate-300 text-xs leading-relaxed">
+                        Bei fehlerhafter Delegation (z.B. Arzt drängt Pflege zur Aufklärung): 1. Mündliche Bedenkenanzeige. 2. Weigerung & schriftliche Dokumentation zum Eigenschutz. 3. Meldung an die Pflegedienstleitung.
+                      </p>
+                    </div>
+                  )}
+
+                  {unlockedNotes.includes('note_8') && (
+                    <div className="bg-slate-950 p-4 rounded-xl border border-purple-500/30">
+                      <h4 className="font-bold text-purple-400 text-sm mb-1">KI-Masterprompts für die Praxis</h4>
+                      <p className="text-slate-300 text-xs leading-relaxed">
+                        Nutzen Sie Ihre KI-Tools mit der CREATE-Methode als Prüfungssimulator für das Pflegerecht oder als Generator für rechtssichere, wertfreie Pflegedokumentationen nach kritischen Vorfällen.
+                      </p>
                     </div>
                   )}
 
