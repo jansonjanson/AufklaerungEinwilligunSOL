@@ -112,6 +112,44 @@ const CopyBlock = ({ title, content, titleColor = "text-blue-400" }: any) => {
   );
 };
 
+const VideoPlayerBlock = ({ title, youtubeId, subtitle, linkUrl }: { title: string, youtubeId: string, subtitle?: string, linkUrl: string }) => {
+  return (
+    <div className="bg-slate-900 border border-slate-700/80 rounded-2xl overflow-hidden shadow-xl mb-6">
+      <div className="p-4 bg-slate-850 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-800">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-rose-600/20 text-rose-500 flex items-center justify-center shrink-0">
+            <Play className="w-5 h-5 fill-rose-500" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-rose-500/20 text-rose-400 rounded">Lehrvideo</span>
+              <h4 className="font-bold text-white text-sm sm:text-base">{title}</h4>
+            </div>
+            {subtitle && <p className="text-xs text-slate-300 mt-0.5">{subtitle}</p>}
+          </div>
+        </div>
+        <a 
+          href={linkUrl} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-colors border border-slate-700 shadow-sm"
+        >
+          Auf YouTube ansehen <ExternalLink className="w-3.5 h-3.5" />
+        </a>
+      </div>
+      <div className="relative aspect-video w-full bg-black">
+        <iframe 
+          src={`https://www.youtube-nocookie.com/embed/${youtubeId}`} 
+          title={title} 
+          className="absolute inset-0 w-full h-full border-0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowFullScreen
+        ></iframe>
+      </div>
+    </div>
+  );
+};
+
 export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: CaseViewerProps & { onCanComplete?: (val: boolean) => void, onUnlockNote?: (noteId: string) => void }) {
   const [hasCopied, setHasCopied] = useState(false);
   
@@ -424,6 +462,40 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
               </div>
             </div>
 
+            {/* Quelltext-Einbindung */}
+            <div className="bg-blue-950/40 border border-blue-500/40 p-4 sm:p-5 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded">Fachliteratur</span>
+                    <h4 className="font-bold text-white text-sm sm:text-base">Quelltext: Leitfaden Aufklärungsgespräch (PDF)</h4>
+                  </div>
+                  <p className="text-xs text-slate-300 mt-1 leading-relaxed [text-wrap:pretty]">
+                    Zentraler Text zum Aufklärungsgespräch: Rechtliche Rahmenbedingungen (§ 630e BGB), Pflichten des Behandlers und Grenzen der pflegerischen Mitwirkung.
+                  </p>
+                </div>
+              </div>
+              <a 
+                href="https://github.com/jansonjanson/AufklaerungEinwilligunSOL/blob/main/Aufklaerungsgespraech.pdf" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-xs sm:text-sm transition-colors shadow-lg"
+              >
+                <FileText className="w-4 h-4" /> Quelltext (PDF) ansehen <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+
+            {/* Lehrvideo 1: Juristische Aspekte */}
+            <VideoPlayerBlock 
+              title="Juristische Aspekte der Patientenaufklärung" 
+              subtitle="Aufklärungspflicht, Beweislastumkehr (§ 630h BGB) und unzulässige Delegation" 
+              youtubeId="sg50e_i_PT8" 
+              linkUrl="https://youtu.be/sg50e_i_PT8?si=nvHiyiHJ7gEWW5Dt" 
+            />
+
             <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800 relative">
               <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-900 font-black flex items-center justify-center shrink-0 z-10">2</div>
               <div className="pt-1 w-full z-10">
@@ -599,6 +671,14 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
                 </div>
               </div>
             </div>
+
+            {/* Lehrvideo 2: Patienten RICHTIG aufklären! */}
+            <VideoPlayerBlock 
+              title="Patienten RICHTIG aufklären! – Prof. Dr. med. Helmut Frohnhofen" 
+              subtitle="Rechtsdepesche: Praktische Kommunikation, Vulnerabilität & wirksamer Informed Consent" 
+              youtubeId="dUTMy6FxXuU" 
+              linkUrl="https://youtu.be/dUTMy6FxXuU?si=DPZRasFGxlk4F8RM" 
+            />
 
             <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800 relative overflow-hidden group">
               <div className="w-8 h-8 rounded-full bg-purple-500 text-white font-black flex items-center justify-center shrink-0 z-10">2</div>
@@ -1303,9 +1383,49 @@ Meine geplanten Interventionen:
 ${case8Handlung || '[Bitte Stichpunkte zur Intervention einfügen]'}`}
                   />
 
-                  <div className="flex justify-end pt-1">
-                    <a href="https://gemini.google.com/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors shadow-lg text-sm">
-                      Zu Gemini wechseln <ExternalLink className="w-4 h-4" />
+                  {/* Digitaler KI-Helfer & Tools Integration */}
+                  <div className="bg-purple-950/40 border border-purple-500/40 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-md">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center shrink-0 mt-0.5">
+                        <Bot className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded">Spezieller KI-Helfer</span>
+                          <h5 className="font-bold text-white text-sm">Digitaler KI-Helfer für diesen Kurs (Google NotebookLM)</h5>
+                        </div>
+                        <p className="text-xs text-purple-200/80 mt-1 leading-relaxed [text-wrap:pretty]">
+                          Unser KI-Helfer enthält bereits alle Kursunterlagen, Gesetzestexte (§ 630e BGB) und Praxisleitfäden. Kopiere die Master-Prompts oben und nutze sie direkt im interaktiven Notebook!
+                        </p>
+                      </div>
+                    </div>
+                    <a 
+                      href="https://notebook.google.com/notebook/36294d79-a601-4870-a351-53ab8c954ac3" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg transition-colors shadow-lg text-xs sm:text-sm"
+                    >
+                      <Bot className="w-4 h-4" /> Zum KI-Helfer wechseln <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
+                    <a 
+                      href="https://github.com/jansonjanson/AufklaerungEinwilligunSOL/blob/main/Aufklaerungsgespraech.pdf" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-blue-400 hover:text-blue-300 hover:underline inline-flex items-center gap-1.5"
+                    >
+                      <FileText className="w-3.5 h-3.5" /> Quelltext „Aufklärungsgespräch.pdf“ zur Fallanalyse heranziehen
+                    </a>
+
+                    <a 
+                      href="https://gemini.google.com/" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="text-slate-400 hover:text-slate-200 hover:underline inline-flex items-center gap-1.5"
+                    >
+                      Alternativ: Zu Gemini wechseln <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
 
