@@ -26,8 +26,8 @@ import {
   Check
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import CaseViewer, { CASES } from './CaseContent';
-import { ROOMS, MAP_IMAGE_URL } from './constants';
+import CaseViewer from './CaseContent';
+import { ROOMS, MAP_IMAGE_URL, CASES } from './constants';
 
 export default function App() {
   const [activeRoom, setActiveRoom] = useState<string | null>(null);
@@ -205,6 +205,9 @@ export default function App() {
     }
     if (id === 5) {
       if (!newNotes.includes('note_5')) newNotes.push('note_5');
+      if (!newMeth.includes('beweislast')) {
+        newMeth.push('beweislast');
+      }
       unlockedSomething = true;
     }
     if (id === 6) {
@@ -230,13 +233,6 @@ export default function App() {
       }
       unlockedSomething = true;
       showAchievement('Juristisches Handwerkszeug erweitert!', 'KI-Masterprompts für die Praxis freigeschaltet.');
-    }
-    if (id === 9) {
-      if (!newNotes.includes('note_9')) newNotes.push('note_9');
-      if (!newMeth.includes('beweislast')) {
-        newMeth.push('beweislast');
-      }
-      unlockedSomething = true;
     }
 
     if (newMeth.length > unlockedMethods.length || newNotes.length > unlockedNotes.length) {
@@ -264,7 +260,7 @@ export default function App() {
 
       saveToLocalStorage(newProgress, unlockedMethods, newNotes);
 
-      if (newProgress.length === 9) {
+      if (newProgress.length === 8) {
         setTimeout(() => {
           setShowFinalModal(true);
         }, 600);
@@ -353,7 +349,7 @@ export default function App() {
         </div>
         
         <div className="flex gap-2 items-center shrink-0">
-          {progress.length === 9 && (
+          {progress.length === 8 && (
             <button 
               onClick={() => setShowFinalModal(true)} 
               className="p-2 bg-amber-500/10 border border-amber-500/50 hover:bg-amber-500/20 text-amber-500 rounded-lg transition-all duration-300 hidden sm:flex items-center justify-center mr-2 animate-pulse" 
@@ -363,7 +359,7 @@ export default function App() {
           )}
           <div className="hidden lg:flex flex-col text-right mr-4">
             <span className="text-[10px] text-slate-300 uppercase font-bold tracking-widest">Fortschritt</span>
-            <span className="text-sm font-black font-mono text-amber-500">{progress.length}/9 Akten erledigt</span>
+            <span className="text-sm font-black font-mono text-amber-500">{progress.length}/8 Akten erledigt</span>
           </div>
           
           <div className={`flex gap-2 items-center transition-all duration-300 ${tutorialStep === 4 || highlightMethodTutorial ? 'bg-slate-900 p-2 rounded-xl ring-4 ring-amber-500/50 shadow-2xl relative z-50' : ''}`}>
@@ -413,6 +409,26 @@ export default function App() {
             />
 
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/30 pointer-events-none" />
+
+            {/* Easter Egg 1: BGB near Anmeldung (top 20%, left 10%) */}
+            <button
+              onClick={() => handleUnlockNote('easter_egg_bgb')}
+              style={{ top: '20%', left: '10%' }}
+              className="absolute -translate-x-1/2 -translate-y-1/2 p-2 rounded-xl bg-slate-900/80 hover:bg-amber-500/20 border border-slate-700/80 hover:border-amber-500 text-slate-400 hover:text-amber-400 backdrop-blur-md shadow-lg transition-all duration-300 hover:scale-125 z-10 group"
+              title="Das BGB untersuchen"
+            >
+              <Book className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 group-hover:animate-bounce" />
+            </button>
+
+            {/* Easter Egg 2: Schutzschild near Arztzimmer (top 80%, left 85%) */}
+            <button
+              onClick={() => handleUnlockNote('easter_egg_shield')}
+              style={{ top: '80%', left: '85%' }}
+              className="absolute -translate-x-1/2 -translate-y-1/2 p-2 rounded-xl bg-slate-900/80 hover:bg-emerald-500/20 border border-slate-700/80 hover:border-emerald-500 text-slate-400 hover:text-emerald-400 backdrop-blur-md shadow-lg transition-all duration-300 hover:scale-125 z-10 group"
+              title="Schutzschild der Pflege untersuchen"
+            >
+              <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 group-hover:animate-bounce" />
+            </button>
 
             {/* Room Markers */}
             {ROOMS.map(room => {
@@ -522,7 +538,7 @@ export default function App() {
                         <div className="space-y-1 pr-4">
                           <div className="flex items-center gap-2">
                             <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-slate-800 text-slate-400 rounded group-hover:bg-amber-500/10 group-hover:text-amber-400 transition-colors">
-                              {c.tag}
+                              {c.tag || `Stunde ${c.hour}`}
                             </span>
                             {isDone && (
                               <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded">
@@ -531,10 +547,10 @@ export default function App() {
                             )}
                           </div>
                           <h4 className="font-bold text-white text-base group-hover:text-amber-400 transition-colors">
-                            {c.title}
+                            Akte 0{c.id}: {c.title}
                           </h4>
                           <p className="text-xs text-slate-400 leading-relaxed line-clamp-1">
-                            {c.subtitle}
+                            {c.subtitle} – {c.description}
                           </p>
                         </div>
                         <div className={`p-2.5 rounded-lg shrink-0 transition-colors ${
@@ -986,7 +1002,7 @@ export default function App() {
 
             <h3 className="text-2xl font-black text-white mb-2">Geschafft! Sie arbeiten juristisch sicher.</h3>
             <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6 [text-wrap:pretty]">
-              Sie haben alle 9 Akten der chirurgischen Station gemeistert und bewiesen, dass Sie rechtliche Fallstricke bei Aufklärung und Einwilligung sicher beherrschen.
+              Sie haben alle 8 Akten der chirurgischen Station gemeistert und bewiesen, dass Sie rechtliche Fallstricke bei Aufklärung und Einwilligung sicher beherrschen.
             </p>
 
             <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-left space-y-2 text-xs text-slate-300 mb-6">
@@ -1027,7 +1043,7 @@ export default function App() {
                     <div>
                       <h4 className="font-bold text-sm text-white">{slotKey}</h4>
                       <p className="text-[11px] text-slate-400">
-                        {slotData ? `${slotData.date} (${slotData.progress.length}/9 Akten)` : 'Leer'}
+                        {slotData ? `${slotData.date} (${slotData.progress.length}/8 Akten)` : 'Leer'}
                       </p>
                     </div>
                     <div className="flex gap-2">

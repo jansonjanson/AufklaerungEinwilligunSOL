@@ -18,18 +18,8 @@ import {
   ChevronUp,
   X
 } from 'lucide-react';
-
-export const CASES = [
-  { id: 1, roomId: 'anmeldung', title: 'Akte 01: Rechtliche Aspekte der Aufklärung', tag: 'Grundlagen & BGB', subtitle: 'Leseauftrag, BGB-Auszug & die 3 wichtigsten Erkenntnisse.' },
-  { id: 2, roomId: 'anmeldung', title: 'Akte 02: Patientenaufklärung in der Praxis (Videos)', tag: 'Praxis-Videos', subtitle: 'Selbstbestimmungs- vs. Sicherungsaufklärung mit Prof. Frohnhofen.' },
-  { id: 3, roomId: 'patientenzimmer', title: 'Akte 03: Die Prämedikation (Fallvignette)', tag: 'Fallanwendung', subtitle: 'Herr Yilmaz (65) in der OP-Schleuse: Wirksamkeit der Einwilligung.' },
-  { id: 4, roomId: 'patientenzimmer', title: 'Akte 04: Formen der Einwilligung (Mini-Fälle)', tag: 'Einwilligungsformen', subtitle: 'Konkludent, mutmaßlich, ausdrücklich oder hypothetisch?' },
-  { id: 5, roomId: 'stationszimmer', title: 'Akte 05: Das große Jura-Quiz', tag: 'Jura-Check', subtitle: 'Körperverletzung, Lückentext & Beweislast (§ 630h BGB).' },
-  { id: 6, roomId: 'stationszimmer', title: 'Akte 06: Die Grenzen der Delegation', tag: 'Delegationsrecht', subtitle: 'Was darf die Pflege? Vorbehaltsaufgaben vs. Arztvorbehalt.' },
-  { id: 7, roomId: 'arztzimmer', title: 'Akte 07: Das Eskalationsmodell (Willensermittlung)', tag: 'Eskalationsmodell', subtitle: 'Stufenprozess bei bewusstlosen Patient:innen ordnen.' },
-  { id: 8, roomId: 'arztzimmer', title: 'Akte 08: KI-Labor & Remonstration', tag: 'Recht & KI-Labor', subtitle: 'Fall Herr Chen: Sokratischer Dialog & rechtssichere Dokumentation.' },
-  { id: 9, roomId: 'arztzimmer', title: 'Akte 09: Beweislast & Dokumentation', tag: 'Beweislast (§ 630h)', subtitle: 'Beweislastumkehr vor Gericht & Pflegedokumentation als Schutzschild.' }
-];
+import { CASES } from './constants';
+export { CASES };
 
 interface CaseViewerProps {
   caseId: number;
