@@ -180,12 +180,12 @@ export default function App() {
     if (id === 1 && !newNotes.includes('note_1')) {
       newNotes.push('note_1');
       unlockedSomething = true;
-      showAchievement('Juristisches Handwerkszeug erweitert!', '§ 223 StGB & § 630d BGB freigeschaltet.');
+      showAchievement('Mein Gesetzbuch erweitert!', '§ 223 StGB & § 630d BGB freigeschaltet.');
     }
     if (id === 2 && !newNotes.includes('note_2')) {
       newNotes.push('note_2');
       unlockedSomething = true;
-      showAchievement('Juristisches Handwerkszeug erweitert!', 'Aufklärungstypen freigeschaltet.');
+      showAchievement('Mein Gesetzbuch erweitert!', 'Aufklärungstypen freigeschaltet.');
     }
     if (id === 3) {
       if (!newNotes.includes('note_3')) newNotes.push('note_3');
@@ -193,7 +193,7 @@ export default function App() {
         newMeth.push('aufklaerung');
       }
       unlockedSomething = true;
-      showAchievement('Juristisches Handwerkszeug erweitert!', 'Urteilskraft & Vorlauf freigeschaltet.');
+      showAchievement('Mein Gesetzbuch erweitert!', 'Urteilskraft & Vorlauf freigeschaltet.');
     }
     if (id === 4) {
       if (!newNotes.includes('note_4')) newNotes.push('note_4');
@@ -201,7 +201,7 @@ export default function App() {
         newMeth.push('consent');
       }
       unlockedSomething = true;
-      showAchievement('Juristisches Handwerkszeug erweitert!', 'Die 4 Einwilligungsformen freigeschaltet.');
+      showAchievement('Mein Gesetzbuch erweitert!', 'Einwilligungsformen freigeschaltet.');
     }
     if (id === 5) {
       if (!newNotes.includes('note_5')) newNotes.push('note_5');
@@ -216,7 +216,7 @@ export default function App() {
         newMeth.push('delegation');
       }
       unlockedSomething = true;
-      showAchievement('Juristisches Handwerkszeug erweitert!', 'Delegationsgrenzen & § 4 PflBG freigeschaltet.');
+      showAchievement('Mein Gesetzbuch erweitert!', 'Delegationsgrenzen freigeschaltet.');
     }
     if (id === 7) {
       if (!newNotes.includes('note_7')) newNotes.push('note_7');
@@ -224,7 +224,7 @@ export default function App() {
         newMeth.push('eskalation');
       }
       unlockedSomething = true;
-      showAchievement('Juristisches Handwerkszeug erweitert!', 'Das Remonstrationsverfahren freigeschaltet.');
+      showAchievement('Mein Gesetzbuch erweitert!', 'Remonstrationsverfahren freigeschaltet.');
     }
     if (id === 8) {
       if (!newNotes.includes('note_8')) newNotes.push('note_8');
@@ -232,7 +232,7 @@ export default function App() {
         newMeth.push('remonstration');
       }
       unlockedSomething = true;
-      showAchievement('Juristisches Handwerkszeug erweitert!', 'KI-Masterprompts für die Praxis freigeschaltet.');
+      showAchievement('Mein Gesetzbuch erweitert!', 'KI-Masterprompts freigeschaltet.');
     }
 
     if (newMeth.length > unlockedMethods.length || newNotes.length > unlockedNotes.length) {
@@ -379,12 +379,12 @@ export default function App() {
               className={`px-3 py-2 sm:px-4 bg-slate-800 border rounded-lg transition-all flex items-center gap-2 font-bold text-xs sm:text-sm ${highlightMethodTutorial ? 'border-amber-500 text-amber-500 animate-pulse ring-2 ring-amber-500/50' : 'border-slate-700 hover:bg-slate-700 hover:text-amber-500 text-slate-300'}`}
             >
               <Scale className={`w-4 h-4 ${highlightMethodTutorial ? 'text-amber-500' : 'text-amber-400'}`} /> 
-              <span className="hidden sm:inline">Gesetzbuch</span>
+              <span className="hidden sm:inline">Paragrafen</span>
               {unlockedMethods.length > 0 && <span className="bg-blue-500 text-white text-[10px] px-1.5 py-0.5 rounded-full ml-1">{unlockedMethods.length}</span>}
             </button>
             
             <button onClick={() => setShowNotes(true)} className="px-3 py-2 sm:px-4 bg-amber-500 hover:bg-amber-400 text-slate-900 font-black rounded-lg shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all flex items-center gap-2 text-xs sm:text-sm uppercase tracking-wider">
-              <NotebookPen className="w-4 h-4" /> <span className="hidden sm:inline">Juristisches Handwerkszeug</span>
+              <NotebookPen className="w-4 h-4" /> <span className="hidden sm:inline">Mein Gesetzbuch</span>
               {unlockedNotes.length > 0 && <span className="bg-slate-900 text-amber-500 text-[10px] px-1.5 py-0.5 rounded-full ml-1 font-bold">{unlockedNotes.length}</span>}
             </button>
           </div>
@@ -414,7 +414,7 @@ export default function App() {
             <button
               onClick={() => handleUnlockNote('easter_egg_bgb')}
               style={{ top: '20%', left: '10%' }}
-              className="absolute -translate-x-1/2 -translate-y-1/2 p-2 rounded-xl bg-slate-900/80 hover:bg-amber-500/20 border border-slate-700/80 hover:border-amber-500 text-slate-400 hover:text-amber-400 backdrop-blur-md shadow-lg transition-all duration-300 hover:scale-125 z-10 group"
+              className="absolute -translate-x-1/2 -translate-y-1/2 p-2 rounded-xl bg-slate-900/80 hover:bg-amber-500/20 border border-slate-700/80 hover:border-amber-500 text-slate-400 hover:text-amber-400 backdrop-blur-md shadow-lg transition-all duration-300 hover:scale-125 z-10 group cursor-pointer"
               title="Das BGB untersuchen"
             >
               <Book className="w-4 h-4 sm:w-5 sm:h-5 text-amber-400 group-hover:animate-bounce" />
@@ -424,7 +424,7 @@ export default function App() {
             <button
               onClick={() => handleUnlockNote('easter_egg_shield')}
               style={{ top: '80%', left: '85%' }}
-              className="absolute -translate-x-1/2 -translate-y-1/2 p-2 rounded-xl bg-slate-900/80 hover:bg-emerald-500/20 border border-slate-700/80 hover:border-emerald-500 text-slate-400 hover:text-emerald-400 backdrop-blur-md shadow-lg transition-all duration-300 hover:scale-125 z-10 group"
+              className="absolute -translate-x-1/2 -translate-y-1/2 p-2 rounded-xl bg-slate-900/80 hover:bg-emerald-500/20 border border-slate-700/80 hover:border-emerald-500 text-slate-400 hover:text-emerald-400 backdrop-blur-md shadow-lg transition-all duration-300 hover:scale-125 z-10 group cursor-pointer"
               title="Schutzschild der Pflege untersuchen"
             >
               <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 group-hover:animate-bounce" />
@@ -516,7 +516,7 @@ export default function App() {
                   </div>
                   <button 
                     onClick={() => setActiveRoom(null)}
-                    className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors text-xs font-bold flex items-center gap-1"
+                    className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors text-xs font-bold flex items-center gap-1 cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" /> Raum verlassen
                   </button>
@@ -529,7 +529,7 @@ export default function App() {
                       <button
                         key={c.id}
                         onClick={() => handleOpenCase(c.id)}
-                        className={`w-full p-4 rounded-xl border text-left flex items-center justify-between transition-all group ${
+                        className={`w-full p-4 rounded-xl border text-left flex items-center justify-between transition-all group cursor-pointer ${
                           isDone 
                             ? 'bg-slate-900/60 border-emerald-500/30 hover:border-emerald-500' 
                             : 'bg-slate-900 border-slate-800 hover:border-amber-500/50 hover:bg-slate-850 shadow-md'
@@ -577,17 +577,17 @@ export default function App() {
                     </div>
                   </div>
                   {activeRoom === 'anmeldung' && isRoom2Unlocked && (
-                    <button onClick={() => setActiveRoom('patientenzimmer')} className="w-full sm:w-auto px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-lg shadow-lg flex items-center justify-center gap-1.5 transition-all shrink-0">
+                    <button onClick={() => setActiveRoom('patientenzimmer')} className="w-full sm:w-auto px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-lg shadow-lg flex items-center justify-center gap-1.5 transition-all shrink-0 cursor-pointer">
                       Weiter zum Patientenzimmer <ChevronLeft className="w-4 h-4 rotate-180" />
                     </button>
                   )}
                   {activeRoom === 'patientenzimmer' && isRoom3Unlocked && (
-                    <button onClick={() => setActiveRoom('stationszimmer')} className="w-full sm:w-auto px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-lg shadow-lg flex items-center justify-center gap-1.5 transition-all shrink-0">
+                    <button onClick={() => setActiveRoom('stationszimmer')} className="w-full sm:w-auto px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-lg shadow-lg flex items-center justify-center gap-1.5 transition-all shrink-0 cursor-pointer">
                       Weiter zum Stationszimmer <ChevronLeft className="w-4 h-4 rotate-180" />
                     </button>
                   )}
                   {activeRoom === 'stationszimmer' && isRoom4Unlocked && (
-                    <button onClick={() => setActiveRoom('arztzimmer')} className="w-full sm:w-auto px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-lg shadow-lg flex items-center justify-center gap-1.5 transition-all shrink-0">
+                    <button onClick={() => setActiveRoom('arztzimmer')} className="w-full sm:w-auto px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider rounded-lg shadow-lg flex items-center justify-center gap-1.5 transition-all shrink-0 cursor-pointer">
                       Weiter zum Arztzimmer <ChevronLeft className="w-4 h-4 rotate-180" />
                     </button>
                   )}
@@ -604,7 +604,7 @@ export default function App() {
               <div className={`sticky top-0 z-30 bg-slate-900/95 backdrop-blur-md border-b p-4 shrink-0 shadow-sm flex items-center justify-start transition-all duration-300 ${highlightBack ? 'border-amber-500 shadow-[0_0_20px_rgba(245,158,11,0.2)]' : 'border-slate-800'}`}>
                 <button 
                   onClick={() => { setActiveCase(null); setHighlightBack(false); }} 
-                  className={`flex items-center gap-2 font-black text-sm transition-all uppercase tracking-widest px-4 py-2 rounded-lg border shadow-lg ${
+                  className={`flex items-center gap-2 font-black text-sm transition-all uppercase tracking-widest px-4 py-2 rounded-lg border shadow-lg cursor-pointer ${
                     highlightBack 
                       ? 'bg-amber-500 hover:bg-amber-400 text-slate-900 border-amber-400 animate-pulse' 
                       : 'text-amber-500 hover:text-amber-400 bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20'
@@ -637,7 +637,7 @@ export default function App() {
                     <button disabled className="w-full font-black text-base sm:text-lg py-3 sm:py-4 rounded-xl flex items-center justify-center gap-3 bg-slate-800 text-slate-400 border border-slate-700 cursor-default">
                       <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500" /> Akte erledigt ✓
                     </button>
-                    <button onClick={() => setActiveCase(null)} className="w-full font-black text-sm py-3 rounded-xl flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-900 shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all uppercase tracking-widest">
+                    <button onClick={() => setActiveCase(null)} className="w-full font-black text-sm py-3 rounded-xl flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-900 shadow-[0_0_15px_rgba(245,158,11,0.3)] transition-all uppercase tracking-widest cursor-pointer">
                       <ChevronLeft className="w-5 h-5" /> Zurück zur Raumübersicht
                     </button>
                   </div>
@@ -664,17 +664,17 @@ export default function App() {
       <div className={`h-16 shrink-0 bg-slate-950 border-t border-slate-900 flex items-center justify-between px-4 sm:px-6 transition-all duration-300 ${tutorialStep === 5 ? 'relative z-50 pointer-events-none' : 'relative z-20'}`}>
         <div className="flex items-center gap-2">
           <div className="text-[10px] uppercase font-bold tracking-widest text-slate-500 hidden sm:block">Pflegerecht Skills Lab</div>
-          <button onClick={() => setShowAdminModal(true)} className="text-slate-600 hover:text-amber-500 transition-colors p-1" title="Admin-Bereich">
+          <button onClick={() => setShowAdminModal(true)} className="text-slate-600 hover:text-amber-500 transition-colors p-1 cursor-pointer" title="Admin-Bereich">
             <LockIcon className="w-3 h-3" />
           </button>
         </div>
         
         <div className="flex items-center gap-2 pointer-events-auto">
-          <button onClick={() => setShowResetConfirm(true)} className="px-3 py-1.5 bg-slate-900 hover:bg-rose-950 hover:text-rose-400 border border-slate-800 text-slate-400 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5">
+          <button onClick={() => setShowResetConfirm(true)} className="px-3 py-1.5 bg-slate-900 hover:bg-rose-950 hover:text-rose-400 border border-slate-800 text-slate-400 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
             <RotateCcw className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Zurücksetzen</span>
           </button>
           
-          <button onClick={() => setShowSaveModal(true)} className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm">
+          <button onClick={() => setShowSaveModal(true)} className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer">
             <FolderOpen className="w-3.5 h-3.5 text-amber-400" /> <span>Speicherplätze</span>
           </button>
         </div>
@@ -702,7 +702,7 @@ export default function App() {
               {tutorialStep === 1 && "Willkommen auf der chirurgischen Station!"}
               {tutorialStep === 2 && "Die Raumübersicht (Krankenhaus)"}
               {tutorialStep === 3 && "Akten & juristische Fälle"}
-              {tutorialStep === 4 && "Gesetzbuch, Handwerkszeug & KI-Helfer"}
+              {tutorialStep === 4 && "Mein Gesetzbuch, Paragrafen & KI-Helfer"}
               {tutorialStep === 5 && "Speicherstände verwalten"}
               {tutorialStep === 6 && "Bereit für die Schicht?"}
             </h3>
@@ -711,7 +711,7 @@ export default function App() {
               {tutorialStep === 1 && "Ihre Schicht beginnt. Im Mittelpunkt des heutigen Skills-Lab-Trainings steht das Thema Aufklärung und Einwilligung. Sie werden lernen, wann ein Eingriff eine Körperverletzung darstellt, welche Einwilligungsformen es gibt und wo die strikten rechtlichen Grenzen zwischen ärztlichen und pflegerischen Aufgaben verlaufen. Klicken Sie auf die '01 Anmeldung', um Ihre ersten Arbeitsaufträge abzuholen."}
               {tutorialStep === 2 && "Links sehen Sie die Raumübersicht des Krankenhauses. Klicken Sie auf die Marker, um die Räume (01 Anmeldung, 02 Patientenzimmer, 03 Stationszimmer, 04 Arztzimmer) zu betreten."}
               {tutorialStep === 3 && "Rechts öffnet sich Ihre Aktenübersicht. Hier bearbeiten und lösen Sie die juristischen Fälle und Arbeitsaufträge."}
-              {tutorialStep === 4 && "Oben rechts finden Sie Ihre Nachschlagewerke: Das Handwerkszeug speichert Ihre Erkenntnisse, das Gesetzbuch liefert Ihnen das juristische Fachwissen (§§ 630 BGB ff.). Beides wird mit Ihrem Lernfortschritt erweitert!"}
+              {tutorialStep === 4 && "Oben rechts finden Sie Ihre Nachschlagewerke: 'Mein Gesetzbuch' speichert Ihre Erkenntnisse, 'Paragrafen' liefert Ihnen das juristische Fachwissen (§§ 630 BGB ff.). Beides wird mit Ihrem Lernfortschritt erweitert!"}
               {tutorialStep === 5 && "Ganz unten rechts können Sie in verschiedenen Speicherplätzen Ihren Fortschritt sichern, laden oder zurücksetzen."}
               {tutorialStep === 6 && "Falls Sie diese Einführung noch einmal ansehen möchten, klicken Sie auf das Info-Symbol oben rechts. Viel Erfolg beim rechtssicheren Lernen!"}
             </p>
@@ -720,7 +720,7 @@ export default function App() {
               {tutorialStep > 1 && (
                 <button 
                   onClick={() => setTutorialStep(prev => prev - 1)}
-                  className="px-5 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-300 font-bold text-xs hover:bg-slate-700 transition-colors"
+                  className="px-5 py-2.5 rounded-xl border border-slate-700 bg-slate-800 text-slate-300 font-bold text-xs hover:bg-slate-700 transition-colors cursor-pointer"
                 >
                   Zurück
                 </button>
@@ -728,7 +728,7 @@ export default function App() {
               {tutorialStep < 6 ? (
                 <button 
                   onClick={() => setTutorialStep(prev => prev + 1)}
-                  className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg transition-all"
+                  className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg transition-all cursor-pointer"
                 >
                   Weiter
                 </button>
@@ -738,7 +738,7 @@ export default function App() {
                     setTutorialStep(0);
                     localStorage.setItem('praxis-jur-tutorial-v4', 'true');
                   }}
-                  className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider shadow-lg transition-all"
+                  className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider shadow-lg transition-all cursor-pointer"
                 >
                   Schicht starten
                 </button>
@@ -748,20 +748,20 @@ export default function App() {
         </div>
       )}
 
-      {/* JURISTISCHES HANDWERKSZEUG (NOTIZBUCH) MODAL */}
+      {/* MEIN GESETZBUCH (NOTIZBUCH) MODAL */}
       {showNotes && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300">
           <div className="bg-slate-900 border-2 border-amber-500/60 rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl relative">
             <div className="p-5 border-b border-slate-800 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2.5">
                 <NotebookPen className="w-5 h-5 text-amber-400" />
-                <h3 id="notes-title" className="font-black text-white text-base uppercase tracking-wider">Juristisches Handwerkszeug</h3>
+                <h3 id="notes-title" className="font-black text-white text-base uppercase tracking-wider">Mein Gesetzbuch</h3>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => handlePrintModal('notes-title', 'notes-content')} className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white" title="Drucken">
+                <button onClick={() => handlePrintModal('notes-title', 'notes-content')} className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white cursor-pointer" title="Drucken">
                   <Printer className="w-4 h-4" />
                 </button>
-                <button onClick={() => setShowNotes(false)} className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white">
+                <button onClick={() => setShowNotes(false)} className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white cursor-pointer">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -771,8 +771,8 @@ export default function App() {
               {unlockedNotes.length === 0 ? (
                 <div className="text-center p-8 border border-dashed border-slate-700 rounded-xl">
                   <BookOpen className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                  <p className="text-slate-400">Ihr juristisches Handwerkszeug ist noch leer.</p>
-                  <p className="text-slate-500 text-xs mt-1">Sammeln Sie rechtliche Erkenntnisse und Badges beim Bearbeiten der Akten.</p>
+                  <p className="text-slate-400">Ihr Gesetzbuch ist noch leer.</p>
+                  <p className="text-slate-500 text-xs mt-1">Sammeln Sie rechtliche Erkenntnisse und Paragrafen beim Bearbeiten der Akten.</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -780,7 +780,7 @@ export default function App() {
                     <div className="bg-slate-950 p-4 rounded-xl border border-blue-500/30">
                       <h4 className="font-bold text-blue-400 text-sm mb-1">§ 223 StGB & § 630d BGB</h4>
                       <p className="text-slate-300 text-xs leading-relaxed">
-                        Jeder Heileingriff ist rechtlich eine Körperverletzung. Die Einwilligung des Patienten ist der zwingende Rechtfertigungsgrund.
+                        § 223 StGB & § 630d BGB: Jeder Heileingriff ist rechtlich eine Körperverletzung. Die Einwilligung des Patienten ist der zwingende Rechtfertigungsgrund.
                       </p>
                     </div>
                   )}
@@ -789,7 +789,7 @@ export default function App() {
                     <div className="bg-slate-950 p-4 rounded-xl border border-rose-500/30">
                       <h4 className="font-bold text-rose-400 text-sm mb-1">Aufklärungstypen</h4>
                       <p className="text-slate-300 text-xs leading-relaxed">
-                        Selbstbestimmungsaufklärung (Arztvorbehalt: Risiken, Alternativen) vs. Sicherungsaufklärung (Pflegeverantwortung: Verhaltensregeln, z.B. Sturzprophylaxe).
+                        Aufklärungstypen: Selbstbestimmungsaufklärung (Arztvorbehalt) vs. Sicherungsaufklärung (Pflegeverantwortung, z.B. Sturzprophylaxe).
                       </p>
                     </div>
                   )}
@@ -798,52 +798,52 @@ export default function App() {
                     <div className="bg-slate-950 p-4 rounded-xl border border-amber-500/30">
                       <h4 className="font-bold text-amber-400 text-sm mb-1">Urteilskraft & Vorlauf</h4>
                       <p className="text-slate-300 text-xs leading-relaxed">
-                        Eine Aufklärung unter Prämedikation oder kurz vor dem Eingriff in der OP-Schleuse ist unwirksam. Bei elektiven Eingriffen müssen idealerweise 24h Bedenkzeit verbleiben.
+                        Urteilskraft & Vorlauf: Aufklärung unter Prämedikation oder kurz vor dem Eingriff in der OP-Schleuse ist unwirksam. (Mind. 24h bei elektiven OPs).
                       </p>
                     </div>
                   )}
 
                   {unlockedNotes.includes('note_4') && (
                     <div className="bg-slate-950 p-4 rounded-xl border border-purple-500/30">
-                      <h4 className="font-bold text-purple-400 text-sm mb-1">Die 4 Einwilligungsformen</h4>
+                      <h4 className="font-bold text-purple-400 text-sm mb-1">Einwilligungsformen</h4>
                       <p className="text-slate-300 text-xs leading-relaxed">
-                        1. Konkludent (schlüssiges Handeln, z.B. Arm hinhalten). 2. Ausdrücklich (meist schriftlich bei OP). 3. Mutmaßlich (Notfall). 4. Hypothetisch (Gerichtseinwand: Patient hätte ohnehin zugestimmt).
+                        Einwilligungsformen: 1. Konkludent. 2. Ausdrücklich. 3. Mutmaßlich. 4. Hypothetisch.
                       </p>
                     </div>
                   )}
 
                   {unlockedNotes.includes('note_5') && (
                     <div className="bg-slate-950 p-4 rounded-xl border border-emerald-500/30">
-                      <h4 className="font-bold text-emerald-400 text-sm mb-1">§ 630h BGB (Beweislastumkehr)</h4>
+                      <h4 className="font-bold text-emerald-400 text-sm mb-1">Beweislastumkehr (§ 630h BGB)</h4>
                       <p className="text-slate-300 text-xs leading-relaxed">
-                        In der Arzthaftung muss die Behandlerseite beweisen, dass lückenlos aufgeklärt wurde („Wer schreibt, der bleibt“). Fehlt die Dokumentation, gilt die Aufklärung als nicht erfolgt.
+                        Beweislastumkehr (§ 630h BGB): Die Behandlerseite muss beweisen, dass lückenlos aufgeklärt wurde ('Wer schreibt, der bleibt').
                       </p>
                     </div>
                   )}
 
                   {unlockedNotes.includes('note_6') && (
                     <div className="bg-slate-950 p-4 rounded-xl border border-blue-500/30">
-                      <h4 className="font-bold text-blue-400 text-sm mb-1">Delegationsgrenzen & § 4 PflBG</h4>
+                      <h4 className="font-bold text-blue-400 text-sm mb-1">Delegationsgrenzen</h4>
                       <p className="text-slate-300 text-xs leading-relaxed">
-                        Die Eingriffsaufklärung unterliegt einem absoluten Delegationsverbot. Die Feststellung des Pflegebedarfs ist hingegen eine eigenständige Vorbehaltsaufgabe der Pflege.
+                        Delegationsgrenzen: Die Eingriffsaufklärung unterliegt einem absoluten Delegationsverbot an die Pflege.
                       </p>
                     </div>
                   )}
 
                   {unlockedNotes.includes('note_7') && (
                     <div className="bg-slate-950 p-4 rounded-xl border border-rose-500/30">
-                      <h4 className="font-bold text-rose-400 text-sm mb-1">Das Remonstrationsverfahren</h4>
+                      <h4 className="font-bold text-rose-400 text-sm mb-1">Remonstrationsverfahren</h4>
                       <p className="text-slate-300 text-xs leading-relaxed">
-                        Bei fehlerhafter Delegation (z.B. Arzt drängt Pflege zur Aufklärung): 1. Mündliche Bedenkenanzeige. 2. Weigerung & schriftliche Dokumentation zum Eigenschutz. 3. Meldung an die Pflegedienstleitung.
+                        Remonstrationsverfahren: 1. Mündliche Bedenken. 2. Weigerung & schriftliche Dokumentation. 3. Meldung an PDL.
                       </p>
                     </div>
                   )}
 
                   {unlockedNotes.includes('note_8') && (
                     <div className="bg-slate-950 p-4 rounded-xl border border-purple-500/30">
-                      <h4 className="font-bold text-purple-400 text-sm mb-1">KI-Masterprompts für die Praxis</h4>
+                      <h4 className="font-bold text-purple-400 text-sm mb-1">KI-Masterprompts</h4>
                       <p className="text-slate-300 text-xs leading-relaxed">
-                        Nutzen Sie Ihre KI-Tools mit der CREATE-Methode als Prüfungssimulator für das Pflegerecht oder als Generator für rechtssichere, wertfreie Pflegedokumentationen nach kritischen Vorfällen.
+                        KI-Masterprompts: Nutzung von KI als Prüfungssimulator und zur Formulierung rechtssicherer CIRS-Meldungen.
                       </p>
                     </div>
                   )}
@@ -894,20 +894,20 @@ export default function App() {
         </div>
       )}
 
-      {/* GESETZBUCH MODAL */}
+      {/* PARAGRAFEN MODAL */}
       {showMethods && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300">
           <div className="bg-slate-900 border-2 border-slate-700 rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl relative">
             <div className="p-5 border-b border-slate-800 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2.5">
                 <Scale className="w-5 h-5 text-amber-400" />
-                <h3 id="methods-title" className="font-black text-white text-base uppercase tracking-wider">Juristisches Gesetzbuch (§§ 630 BGB ff.)</h3>
+                <h3 id="methods-title" className="font-black text-white text-base uppercase tracking-wider">Juristische Paragrafen (§§ 630 BGB ff.)</h3>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => handlePrintModal('methods-title', 'methods-content')} className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white" title="Drucken">
+                <button onClick={() => handlePrintModal('methods-title', 'methods-content')} className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white cursor-pointer" title="Drucken">
                   <Printer className="w-4 h-4" />
                 </button>
-                <button onClick={() => setShowMethods(false)} className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white">
+                <button onClick={() => setShowMethods(false)} className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white cursor-pointer">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -1014,7 +1014,7 @@ export default function App() {
 
             <button 
               onClick={() => setShowFinalModal(false)}
-              className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm uppercase tracking-wider shadow-lg transition-colors"
+              className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm uppercase tracking-wider shadow-lg transition-colors cursor-pointer"
             >
               Abschließen & zur Station zurückkehren
             </button>
@@ -1030,7 +1030,7 @@ export default function App() {
               <h3 className="font-bold text-white text-base flex items-center gap-2">
                 <FolderOpen className="w-5 h-5 text-amber-500" /> Speicherplätze
               </h3>
-              <button onClick={() => setShowSaveModal(false)} className="text-slate-400 hover:text-white p-1">
+              <button onClick={() => setShowSaveModal(false)} className="text-slate-400 hover:text-white p-1 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1049,14 +1049,14 @@ export default function App() {
                     <div className="flex gap-2">
                       <button 
                         onClick={() => handleSaveSlot(slotKey)}
-                        className="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 rounded text-xs font-bold transition-colors"
+                        className="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 border border-amber-500/30 rounded text-xs font-bold transition-colors cursor-pointer"
                       >
                         Speichern
                       </button>
                       {slotData && (
                         <button 
                           onClick={() => handleLoadSlot(slotKey)}
-                          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded text-xs font-bold transition-colors"
+                          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded text-xs font-bold transition-colors cursor-pointer"
                         >
                           Laden
                         </button>
@@ -1077,13 +1077,13 @@ export default function App() {
             <RotateCcw className="w-10 h-10 text-rose-500 mx-auto mb-3" />
             <h3 className="font-bold text-white text-lg mb-1">Fortschritt zurücksetzen?</h3>
             <p className="text-slate-300 text-xs mb-6">
-              Möchten Sie alle gelösten Akten und freigeschalteten Notizen unwiderruflich zurücksetzen?
+              Möchten Sie alle gelösten Akten und freigeschalteten Paragrafen unwiderruflich zurücksetzen?
             </p>
             <div className="flex gap-3 justify-center">
-              <button onClick={() => setShowResetConfirm(false)} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold">
+              <button onClick={() => setShowResetConfirm(false)} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold cursor-pointer">
                 Abbrechen
               </button>
-              <button onClick={performResetGame} className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold">
+              <button onClick={performResetGame} className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-bold cursor-pointer">
                 Ja, alles zurücksetzen
               </button>
             </div>
@@ -1099,7 +1099,7 @@ export default function App() {
               <h3 className="font-bold text-white text-base flex items-center gap-2">
                 <LockIcon className="w-5 h-5 text-amber-500" /> Dozierenden-Modus
               </h3>
-              <button onClick={() => setShowAdminModal(false)} className="text-slate-400 hover:text-white p-1">
+              <button onClick={() => setShowAdminModal(false)} className="text-slate-400 hover:text-white p-1 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -1113,7 +1113,7 @@ export default function App() {
                     localStorage.removeItem('praxis-jur-admin-v4');
                     showAchievement('Dozierenden-Modus deaktiviert', 'Reguläre Freischaltungen aktiv.');
                   }}
-                  className="w-full py-2 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 rounded-lg text-xs font-bold transition-colors"
+                  className="w-full py-2 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 rounded-lg text-xs font-bold transition-colors cursor-pointer"
                 >
                   Dozierenden-Modus deaktivieren
                 </button>
@@ -1139,7 +1139,7 @@ export default function App() {
                       alert('Falsches Passwort!');
                     }
                   }}
-                  className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs transition-colors"
+                  className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs transition-colors cursor-pointer"
                 >
                   Freischalten
                 </button>

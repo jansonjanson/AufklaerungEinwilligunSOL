@@ -10,13 +10,13 @@ export interface CaseItem {
   id: number;
   hour: number;
   session: number;
+  roomId: string;
   title: string;
   subtitle: string;
   icon: string;
   description: string;
   content: string;
   tasks: string[];
-  roomId: string;
   tag?: string;
 }
 
@@ -30,108 +30,108 @@ export const ROOMS: Room[] = [
 ];
 
 export const CASES: CaseItem[] = [
-  {
-    id: 1,
-    hour: 1,
-    session: 1,
+  { 
+    id: 1, 
+    hour: 1, 
+    session: 1, 
     roomId: 'anmeldung',
-    tag: 'Grundlagen',
-    title: 'Die juristische Basis',
-    subtitle: '§ 223 StGB & § 630 BGB',
-    icon: 'FileText',
-    description: 'Jeder ärztliche Heileingriff ist rechtlich eine Körperverletzung. Erarbeiten Sie sich das juristische Fundament.',
-    content: 'Studium des BGB und des CNE-Fachartikels. Extrahieren der wichtigsten juristischen Erkenntnisse.',
-    tasks: ['Dokumentenstudium', 'Erkenntnisse mit KI abgleichen']
+    title: 'Die juristische Basis', 
+    subtitle: '§ 223 StGB & § 630 BGB', 
+    icon: 'FileText', 
+    description: 'Jeder ärztliche Heileingriff ist rechtlich eine Körperverletzung.', 
+    content: 'Studium des BGB und des CNE-Fachartikels.', 
+    tasks: ['Dokumentenstudium', 'Erkenntnisse mit KI abgleichen'],
+    tag: 'Grundlagen'
   },
-  {
-    id: 2,
-    hour: 1,
-    session: 2,
+  { 
+    id: 2, 
+    hour: 1, 
+    session: 2, 
     roomId: 'anmeldung',
-    tag: 'Video-Analyse',
-    title: 'Aufklärungstypen in der Praxis',
-    subtitle: 'Arztvorbehalt vs. Pflege',
-    icon: 'Play',
-    description: 'Video-Analyse: Wer klärt worüber auf? Die strikte Trennung von Eingriffs- und Sicherungsaufklärung.',
-    content: 'Zwei Praxis-Videos der Rechtsdepesche mit Prof. Dr. med. Helmut Frohnhofen.',
-    tasks: ['Video-Analyse', 'Definition der Zuständigkeiten']
+    title: 'Aufklärungstypen in der Praxis', 
+    subtitle: 'Arztvorbehalt vs. Pflege', 
+    icon: 'Play', 
+    description: 'Video-Analyse: Wer klärt worüber auf?', 
+    content: 'Zwei Praxis-Videos der Rechtsdepesche.', 
+    tasks: ['Video-Analyse', 'Definition der Zuständigkeiten'],
+    tag: 'Praxis-Videos'
   },
-  {
-    id: 3,
-    hour: 2,
-    session: 1,
+  { 
+    id: 3, 
+    hour: 2, 
+    session: 1, 
     roomId: 'patientenzimmer',
-    tag: 'Fallvignette',
-    title: 'Fallvignette: Die Prämedikation',
-    subtitle: 'Urteilskraft & Vorlaufzeit',
-    icon: 'AlertCircle',
-    description: 'Frau Meinhardt wird in der OP-Schleuse unter Medikamenteneinfluss aufgeklärt. Eine juristische Falle.',
-    content: 'Bewertung der Einwilligungsfähigkeit und der Rechtzeitigkeit der ärztlichen Aufklärung.',
-    tasks: ['Rechtliche Bewertung', 'Musterlösung prüfen']
+    title: 'Fallvignette: Die Prämedikation', 
+    subtitle: 'Urteilskraft & Vorlaufzeit', 
+    icon: 'AlertCircle', 
+    description: 'Frau Meinhardt wird in der OP-Schleuse unter Medikamenteneinfluss aufgeklärt.', 
+    content: 'Bewertung der Einwilligungsfähigkeit.', 
+    tasks: ['Rechtliche Bewertung', 'Musterlösung prüfen'],
+    tag: 'Fallanwendung'
   },
-  {
-    id: 4,
-    hour: 2,
-    session: 2,
+  { 
+    id: 4, 
+    hour: 2, 
+    session: 2, 
     roomId: 'patientenzimmer',
-    tag: 'Einwilligung',
-    title: 'Die 4 Einwilligungsformen',
-    subtitle: 'Von konkludent bis mutmaßlich',
-    icon: 'CheckSquare',
-    description: 'Einwilligungen müssen nicht immer schriftlich erfolgen. Ordnen Sie 4 Alltagssituationen juristisch korrekt ein.',
-    content: 'Fallbeispiele zu: Konkludent, Mutmaßlich, Ausdrücklich, Hypothetisch (sowie Aufklärungsverzicht).',
-    tasks: ['Szenarien bewerten']
+    title: 'Die 4 Einwilligungsformen', 
+    subtitle: 'Von konkludent bis mutmaßlich', 
+    icon: 'CheckSquare', 
+    description: 'Ordnen Sie 4 Alltagssituationen juristisch korrekt ein.', 
+    content: 'Fallbeispiele zu: Konkludent, Mutmaßlich, Ausdrücklich, Hypothetisch.', 
+    tasks: ['Szenarien bewerten'],
+    tag: 'Einwilligung'
   },
-  {
-    id: 5,
-    hour: 3,
-    session: 1,
+  { 
+    id: 5, 
+    hour: 3, 
+    session: 1, 
     roomId: 'stationszimmer',
-    tag: 'Wissenstest',
-    title: 'Das große Jura-Quiz',
-    subtitle: 'Wissenstest & Beweislast',
-    icon: 'HelpCircle',
-    description: 'Testen Sie Ihr juristisches Wissen zu Körperverletzung, Beweislastumkehr und den Einwilligungsformen.',
-    content: 'Klausur-Simulator mit Multiple-Choice und Lückentexten.',
-    tasks: ['Klausurfragen beantworten']
+    title: 'Das große Jura-Quiz', 
+    subtitle: 'Wissenstest & Beweislast', 
+    icon: 'HelpCircle', 
+    description: 'Testen Sie Ihr juristisches Wissen.', 
+    content: 'Klausur-Simulator mit MC-Fragen.', 
+    tasks: ['Klausurfragen beantworten'],
+    tag: 'Wissenstest'
   },
-  {
-    id: 6,
-    hour: 3,
-    session: 2,
+  { 
+    id: 6, 
+    hour: 3, 
+    session: 2, 
     roomId: 'stationszimmer',
-    tag: 'Delegation',
-    title: 'Grenzen der Delegation',
-    subtitle: 'Was darf die Pflege?',
-    icon: 'Shield',
-    description: 'Vertikale Arbeitsteilung im Krankenhaus. Welche Aufgaben sind delegationsfähig und welche sind ärztlicher Vorbehalt?',
-    content: 'Zuordnung von Aufgaben zu Arztvorbehalt, Behandlungspflege und § 4 PflBG.',
-    tasks: ['Verantwortungsbereiche abstecken']
+    title: 'Grenzen der Delegation', 
+    subtitle: 'Was darf die Pflege?', 
+    icon: 'Shield', 
+    description: 'Welche Aufgaben sind delegationsfähig und welche sind ärztlicher Vorbehalt?', 
+    content: 'Zuordnung von Aufgaben im Stationsalltag.', 
+    tasks: ['Verantwortungsbereiche abstecken'],
+    tag: 'Delegation'
   },
-  {
-    id: 7,
-    hour: 4,
-    session: 1,
+  { 
+    id: 7, 
+    hour: 4, 
+    session: 1, 
     roomId: 'arztzimmer',
-    tag: 'Eskalationsmodell',
-    title: 'Das Eskalationsmodell',
-    subtitle: 'Handeln bei Bewusstlosigkeit',
-    icon: 'ListOrdered',
-    description: 'Ein bewusstloser Notfallpatient wird eingeliefert. Wie ist die korrekte rechtliche Reihenfolge der Willensermittlung?',
-    content: 'Sortieren Sie die Phasen von Notfallindikation bis zum mutmaßlichen Willen.',
-    tasks: ['Reihenfolge herstellen']
+    title: 'Das Eskalationsmodell', 
+    subtitle: 'Handeln bei Bewusstlosigkeit', 
+    icon: 'ListOrdered', 
+    description: 'Ein bewusstloser Notfallpatient wird eingeliefert.', 
+    content: 'Reihenfolge der Willensermittlung herstellen.', 
+    tasks: ['Reihenfolge herstellen'],
+    tag: 'Eskalationsmodell'
   },
-  {
-    id: 8,
-    hour: 4,
-    session: 2,
+  { 
+    id: 8, 
+    hour: 4, 
+    session: 2, 
     roomId: 'arztzimmer',
-    tag: 'KI & Doku',
-    title: 'KI-Labor & Remonstration',
-    subtitle: 'Kollision im Arztzimmer',
-    icon: 'Bot',
-    description: 'Der Chirurg delegiert rechtswidrig die Risikoaufklärung an Sie. Nutzen Sie KI, um die Remonstration zu trainieren.',
-    content: 'Sokratischer KI-Dialog zur Remonstrationspflicht und Generator für rechtssichere Pflegedokumentation.',
-    tasks: ['KI-Sparring', 'Rechtssichere Doku erstellen', 'fobizz Board']
+    title: 'KI-Labor & Remonstration', 
+    subtitle: 'Kollision im Arztzimmer', 
+    icon: 'Bot', 
+    description: 'Der Chirurg delegiert rechtswidrig die Risikoaufklärung an Sie.', 
+    content: 'Sokratischer KI-Dialog zur Remonstrationspflicht.', 
+    tasks: ['KI-Sparring', 'Rechtssichere Doku erstellen'],
+    tag: 'KI & Doku'
   }
 ];

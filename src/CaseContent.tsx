@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { 
   CheckCircle2, 
   ExternalLink, 
@@ -83,7 +82,7 @@ const StyledTextarea = ({ label, description, value, onChange, placeholder, step
           {step && <span className={`${activeColor.bg} text-white text-xs font-black w-5 h-5 flex items-center justify-center rounded-full`}>{step}</span>}
           {label && <label className={`text-xs font-bold ${activeColor.text} uppercase tracking-widest`}>{label}</label>}
         </div>
-        <button onClick={handleCopy} className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white transition-colors" title="Kopieren">
+        <button onClick={handleCopy} className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white transition-colors cursor-pointer" title="Kopieren">
           {copied ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
         </button>
       </div>
@@ -109,7 +108,7 @@ const CopyBlock = ({ title, content, titleColor = "text-blue-400" }: any) => {
     <div className="bg-slate-950 border border-slate-700 p-4 rounded-xl relative group my-3">
       <div className="flex justify-between items-center mb-3">
         <h5 className={`font-bold ${titleColor} text-sm uppercase tracking-widest`}>{title}</h5>
-        <button onClick={handleCopy} className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 text-xs font-bold" title="In die Zwischenablage kopieren">
+        <button onClick={handleCopy} className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 text-xs font-bold cursor-pointer" title="In die Zwischenablage kopieren">
           {copied ? <><Check className="w-3.5 h-3.5 text-emerald-500" /> Kopiert</> : <><Copy className="w-3.5 h-3.5" /> Prompt kopieren</>}
         </button>
       </div>
@@ -199,11 +198,6 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
 
   // Case 8 states
   const [case8Notes, setCase8Notes] = useState(() => localStorage.getItem('praxis-c8-notes') || '');
-  const [case8ShowSolution, setCase8ShowSolution] = useState(false);
-
-  // Case 9 states
-  const [case9Analysis, setCase9Analysis] = useState(() => localStorage.getItem('praxis-c9-analysis') || '');
-  const [case9ShowSolution, setCase9ShowSolution] = useState(false);
 
   // Save changes
   useEffect(() => { localStorage.setItem('praxis-c1-notes', case1Notes); }, [case1Notes]);
@@ -216,7 +210,6 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
   useEffect(() => { localStorage.setItem('praxis-c4-s4', case4S4); }, [case4S4]);
   useEffect(() => { localStorage.setItem('praxis-c5-q3text', case5Q3Text); }, [case5Q3Text]);
   useEffect(() => { localStorage.setItem('praxis-c8-notes', case8Notes); }, [case8Notes]);
-  useEffect(() => { localStorage.setItem('praxis-c9-analysis', case9Analysis); }, [case9Analysis]);
 
   // Completion criteria handling
   useEffect(() => {
@@ -238,8 +231,6 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
       onCanComplete(case7Passed);
     } else if (caseId === 8) {
       onCanComplete(case8Notes.trim().length > 10);
-    } else if (caseId === 9) {
-      onCanComplete(case9Analysis.trim().length > 10);
     }
   }, [
     caseId, 
@@ -255,7 +246,6 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
     case6Passed, 
     case7Passed, 
     case8Notes, 
-    case9Analysis, 
     onCanComplete
   ]);
 
@@ -273,6 +263,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
 
     if (allCorrect && onUnlockNote) {
       onUnlockNote('badge_expert_5');
+      onUnlockNote('note_5');
     }
   };
 
@@ -286,11 +277,14 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
     const allCorrect = correct1 && correct2 && correct3 && correct4;
     setCase6Submitted(true);
     setCase6Passed(allCorrect);
+    if (allCorrect && onUnlockNote) {
+      onUnlockNote('note_6');
+    }
   };
 
   // Case 7 validation
   const evaluateCase7 = () => {
-    // 1: Notfallindikation, 2: Patientenverfügung, 3: Betreuer/Vollmacht, 4: Mutmaßlicher Wille
+    // 1: Notfallindikation, 2: Suche nach Patientenverfügung, 3: Gesetzlicher Betreuer / Bevollmächtigter, 4: Mutmaßlicher Wille
     const correct1 = case7Slots[1] === 'notfall';
     const correct2 = case7Slots[2] === 'verfuegung';
     const correct3 = case7Slots[3] === 'betreuer';
@@ -302,6 +296,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
 
     if (allCorrect && onUnlockNote) {
       onUnlockNote('badge_expert_7');
+      onUnlockNote('note_7');
     }
   };
 
@@ -312,7 +307,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
         <div className="space-y-6">
           <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
             <span className="px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 font-black text-xs uppercase tracking-wider">Raum 01: Anmeldung</span>
-            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 01: Rechtliche Aspekte der Aufklärung</h2>
+            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 01: Die juristische Basis</h2>
             <p className="text-slate-300 text-sm mt-2 leading-relaxed [text-wrap:pretty]">
               Lieber Kurs, bevor Sie zu den Patient:innen gehen, müssen die rechtlichen Rahmenbedingungen absolut klar sein. Lesen Sie sich die folgenden juristischen Kernauszüge aus dem BGB und dem CNE-Fachartikel sorgfältig durch. Für ein tieferes Verständnis laden Sie sich das vollständige PDF herunter.
             </p>
@@ -336,7 +331,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
                 <ExternalLink className="w-3.5 h-3.5 text-blue-400" /> § 630e BGB auf gesetze-im-internet.de
               </a>
               <a 
-                href="https://github.com/jansonjanson/AufklaerungEinwilligunSOL/blob/main/Aufklaerungsgespraech.pdf?raw=true" 
+                href="https://raw.githubusercontent.com/jansonjanson/AufklaerungEinwilligunSOL/main/Aufklaerungsgespraech.pdf" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white rounded-lg text-xs font-bold transition-colors border border-blue-500/40 shadow-sm"
@@ -355,7 +350,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
               </div>
               <button 
                 onClick={() => onUnlockNote && onUnlockNote('easter_egg_bgb')}
-                className="text-slate-500 hover:text-amber-400 transition-colors p-1"
+                className="text-slate-500 hover:text-amber-400 transition-colors p-1 cursor-pointer"
                 title="BGB-Auszug untersuchen"
               >
                 <Book className="w-4 h-4" />
@@ -398,6 +393,12 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
                   </p>
                 </div>
               </div>
+
+              <div className="border-l-4 border-emerald-500 pl-4 py-2 bg-emerald-500/10 rounded-r text-slate-200">
+                <p className="font-sans text-xs sm:text-sm">
+                  <strong className="text-emerald-400">§ 630h BGB (Beweislast bei Haftung für Behandlungs- und Aufklärungsfehler):</strong> Der Behandelnde hat zu beweisen, dass er eine Einwilligung gemäß § 630d eingeholt und entsprechend den Anforderungen des § 630e aufgeklärt hat.
+                </p>
+              </div>
             </div>
           </div>
 
@@ -419,7 +420,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
             <div className="flex flex-wrap items-center gap-3 mt-4">
               <button 
                 onClick={() => setCase1ShowSolution(!case1ShowSolution)}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-700"
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-700 cursor-pointer"
               >
                 {case1ShowSolution ? 'Musterlösung verbergen' : 'Erkenntnisse mit KI-Tutor / Musterlösung abgleichen'}
               </button>
@@ -445,7 +446,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
         <div className="space-y-6">
           <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
             <span className="px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 font-black text-xs uppercase tracking-wider">Raum 01: Anmeldung</span>
-            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 02: Patientenaufklärung in der Praxis (Videos)</h2>
+            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 02: Aufklärungstypen in der Praxis</h2>
             <p className="text-slate-300 text-sm mt-2 leading-relaxed [text-wrap:pretty]">
               Die Theorie sitzt. Sehen Sie sich nun die beiden Praxis-Videos der Rechtsdepesche (mit Prof. Dr. med. Helmut Frohnhofen) an. Hier wird die wichtige Abgrenzung zwischen ärztlicher und pflegerischer Aufklärung sowie die Bedeutung des 'Aufklärungsverzichts' deutlich.
             </p>
@@ -467,17 +468,23 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
             linkUrl="https://youtu.be/dUTMy6FxXuU?si=DPZRasFGxlk4F8RM"
           />
 
-          {/* Video-Highlights Box */}
-          <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2 mb-6 shadow-md">
-            <h4 className="font-bold text-amber-400 text-sm flex items-center gap-2">
-              <span>💡</span> Wichtige Video-Kernzitate von Prof. Dr. Frohnhofen:
-            </h4>
-            <ul className="list-disc list-inside text-xs text-slate-300 space-y-1 leading-relaxed">
-              <li>Aufklärung basiert auf einer vertrauensvollen Beziehung und verlangt einen freien, unbeeinflussten Willen.</li>
-              <li>Bei elektiven Eingriffen muss eine klare räumliche und zeitliche Trennung zwischen Aufklärungsgespräch und OP-Beginn liegen.</li>
-              <li>Ein Aufklärungsverzicht des Patienten ist zulässig, muss jedoch zwingend in der Akte dokumentiert werden!</li>
-            </ul>
-          </div>
+          {/* Ausklappbare Transkripte & Kernzitate Box */}
+          <details className="bg-slate-900 border border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-lg group">
+            <summary className="font-bold text-amber-400 text-sm flex items-center justify-between cursor-pointer select-none">
+              <span className="flex items-center gap-2">
+                <span>💡</span> Transkripte & Kernzitate einblenden
+              </span>
+              <span className="text-xs text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            <div className="mt-4 pt-3 border-t border-slate-800 text-xs sm:text-sm text-slate-300 space-y-3 leading-relaxed">
+              <p>
+                <strong className="text-amber-300">💡 Kernzitate Prof. Frohnhofen:</strong> Aufklärung basiert auf Vertrauen und freiem Willen. Bei planbaren Eingriffen muss eine klare räumliche und zeitliche Trennung zwischen Gespräch und OP liegen. Ein Aufklärungsverzicht ist zulässig, muss aber dokumentiert werden.
+              </p>
+              <p>
+                <strong className="text-blue-300">Rechtsdepesche:</strong> Mangelhafte Aufklärung führt oft zu verlorenen Arzthaftungsprozessen. Wir unterscheiden <strong>Selbstbestimmungsaufklärung</strong> (Diagnose, Risiko) und <strong>Sicherungsaufklärung</strong> (Verhaltensregeln für den Patienten).
+              </p>
+            </div>
+          </details>
 
           {/* Arbeitsauftrag 2 */}
           <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4">
@@ -508,7 +515,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
 
             <button 
               onClick={() => setCase2ShowSolution(!case2ShowSolution)}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-700"
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-700 cursor-pointer"
             >
               {case2ShowSolution ? 'Musterlösung verbergen' : 'Musterlösung anzeigen'}
             </button>
@@ -538,7 +545,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
         <div className="space-y-6">
           <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
             <span className="px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-400 font-black text-xs uppercase tracking-wider">Raum 02: Patientenzimmer</span>
-            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 03: Die Prämedikation (Fallvignette)</h2>
+            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 03: Fallvignette: Die Prämedikation</h2>
             <p className="text-slate-300 text-sm mt-2 leading-relaxed [text-wrap:pretty]">
               Wenden Sie Ihr juristisches Wissen auf ein typisches operatives Krankenhausszenario an.
             </p>
@@ -548,10 +555,10 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
           <div className="bg-amber-950/20 border-2 border-amber-500/50 p-5 rounded-2xl shadow-lg relative">
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangle className="w-5 h-5 text-amber-400" />
-              <h3 className="font-black text-amber-400 text-sm uppercase tracking-wider">Fallvignette: Herr Yilmaz (65)</h3>
+              <h3 className="font-black text-amber-400 text-sm uppercase tracking-wider">Fallvignette: Frau Meinhardt</h3>
             </div>
             <p className="text-slate-200 text-sm sm:text-base leading-relaxed [text-wrap:pretty]">
-              „Herr Yilmaz (65) soll am Vormittag operiert werden. Am Morgen, kurz nach der Gabe eines stark beruhigenden Medikaments (Prämedikation), wird er in der OP-Schleuse vom Assistenzarzt über den bevorstehenden Eingriff aufgeklärt. Herr Yilmaz wirkt sehr schläfrig, nickt aber und unterschreibt den Aufklärungsbogen.“
+              „Frau Meinhardt soll am Vormittag operiert werden. Am Morgen, kurz nach der Gabe eines stark beruhigenden Medikaments (Prämedikation), wird sie in der OP-Schleuse vom Assistenzarzt über den bevorstehenden Eingriff aufgeklärt. Frau Meinhardt wirkt sehr schläfrig, nickt aber und unterschreibt den Aufklärungsbogen.“
             </p>
           </div>
 
@@ -560,7 +567,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
             <div>
               <h3 className="font-bold text-white text-base mb-1">Arbeitsauftrag:</h3>
               <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
-                Bewerten Sie aus rechtlicher Sicht die Wirksamkeit der Einwilligung von Herrn Yilmaz. Was lief falsch? Begründen Sie Ihre Einschätzung kurz und fachlich korrekt in der Box.
+                Bewerten Sie aus rechtlicher Sicht die Wirksamkeit der Einwilligung von Frau Meinhardt. Was lief falsch? Begründen Sie Ihre Einschätzung kurz und fachlich korrekt in der Box.
               </p>
             </div>
 
@@ -574,7 +581,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
 
             <button 
               onClick={() => setCase3ShowSolution(!case3ShowSolution)}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-700"
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-700 cursor-pointer"
             >
               {case3ShowSolution ? 'Musterlösung verbergen' : 'Musterlösung anzeigen'}
             </button>
@@ -585,10 +592,10 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
                 <p className="font-bold text-white">Die Einwilligung ist unwirksam. Begründung:</p>
                 <ol className="list-decimal list-inside space-y-2 text-slate-300">
                   <li>
-                    <strong className="text-white">Fehlende Urteilskraft & Gemütsruhe:</strong> Herr Yilmaz war durch die Prämedikation medikamentös beeinflusst und besaß nicht mehr die nötige „Urteilskraft und Gemütsruhe“, um die Tragweite der Erklärung zu erfassen.
+                    <strong className="text-white">Fehlende Urteilskraft & Gemütsruhe:</strong> Frau Meinhardt war durch die Prämedikation medikamentös beeinflusst und besaß nicht mehr die nötige „Urteilskraft und Gemütsruhe“, um die Tragweite der Erklärung zu erfassen.
                   </li>
                   <li>
-                    <strong className="text-white">Verletzung der Rechtzeitigkeit:</strong> Es gab keine deutliche Trennung zwischen dem Aufklärungsgespräch und dem Behandlungsgeschehen. Der Patient muss die Möglichkeit haben, die Entscheidung zu reflektieren (ausreichender zeitlicher Vorlauf, bei elektiven Eingriffen mind. 24h!).
+                    <strong className="text-white">Verletzung der Rechtzeitigkeit:</strong> Es gab keine deutliche Trennung zwischen dem Aufklärungsgespräch und dem Behandlungsgeschehen. Die Patientin muss die Möglichkeit haben, die Entscheidung zu reflektieren (ausreichender zeitlicher Vorlauf, bei elektiven Eingriffen mind. 24h!).
                   </li>
                 </ol>
                 <div className="p-3 bg-rose-950/40 border border-rose-500/40 rounded-lg text-rose-300 font-bold">
@@ -605,7 +612,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
         <div className="space-y-6">
           <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
             <span className="px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-400 font-black text-xs uppercase tracking-wider">Raum 02: Patientenzimmer</span>
-            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 04: Formen der Einwilligung (Mini-Fälle)</h2>
+            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 04: Die 4 Einwilligungsformen</h2>
             <p className="text-slate-300 text-sm mt-2 leading-relaxed [text-wrap:pretty]">
               Einwilligungen müssen nicht immer schriftlich erfolgen. Ordnen Sie den folgenden vier pflegerischen und ärztlichen Alltagssituationen die korrekte juristische Form zu.
             </p>
@@ -644,8 +651,8 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
 
             <StyledTextarea 
               step="4"
-              label="Szenario 4: Gallengangverletzung & nachträgliche Rüge"
-              description="Ein Arzt klärt vor einer Gallen-OP nicht über das Risiko einer Gallengangverletzung auf. Die Komplikation tritt ein. Vor Gericht beruft sich der Arzt darauf, dass der Patient bei Kenntnis des Risikos wegen starker Schmerzen die OP dennoch hätte durchführen lassen. Welche Einwilligungsform meint er?"
+              label="Szenario 4: Unterlassene Risikoaufklärung vor OP"
+              description="Ein Arzt klärt vor einer OP nicht über ein Risiko auf. Vor Gericht behauptet er später: 'Der Patient hätte wegen starker Schmerzen auch bei korrekter Aufklärung eingewilligt.' Welche Einwilligungsform meint er?"
               placeholder="Welche besondere juristische Einwilligungsform / Einwand des Behandlers liegt hier vor?"
               value={case4S4}
               onChange={(e: any) => setCase4S4(e.target.value)}
@@ -654,7 +661,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
 
             <button 
               onClick={() => setCase4ShowSolution(!case4ShowSolution)}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-700"
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-700 cursor-pointer"
             >
               {case4ShowSolution ? 'Musterlösung verbergen' : 'Musterlösung anzeigen'}
             </button>
@@ -712,7 +719,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
                       name="q1" 
                       checked={case5Q1 === opt.id} 
                       onChange={() => setCase5Q1(opt.id)}
-                      className="accent-purple-500" 
+                      className="accent-purple-500 cursor-pointer" 
                     />
                     <span><strong>{opt.id})</strong> {opt.text}</span>
                   </label>
@@ -739,7 +746,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
                       type="checkbox" 
                       checked={case5Q2[opt.id]} 
                       onChange={(e) => setCase5Q2({ ...case5Q2, [opt.id]: e.target.checked })}
-                      className="accent-purple-500 mt-0.5" 
+                      className="accent-purple-500 mt-0.5 cursor-pointer" 
                     />
                     <span><strong>{opt.id})</strong> {opt.text}</span>
                   </label>
@@ -771,7 +778,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
               <div className="space-y-2 text-xs sm:text-sm">
                 {[
                   { id: 'A', text: 'Der Patient' },
-                  { id: 'B', text: 'Die Behandlerseite (Arzt / Klinik)' },
+                  { id: 'B', text: 'Die Behandlerseite (Klinik/Arzt)' },
                   { id: 'C', text: 'Die Krankenkasse' }
                 ].map((opt) => (
                   <label key={opt.id} className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${case5Q4 === opt.id ? 'bg-purple-950/40 border-purple-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'}`}>
@@ -780,7 +787,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
                       name="q4" 
                       checked={case5Q4 === opt.id} 
                       onChange={() => setCase5Q4(opt.id)}
-                      className="accent-purple-500" 
+                      className="accent-purple-500 cursor-pointer" 
                     />
                     <span><strong>{opt.id})</strong> {opt.text}</span>
                   </label>
@@ -790,7 +797,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
 
             <button 
               onClick={evaluateCase5}
-              className="w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-sm uppercase tracking-wider shadow-lg transition-colors"
+              className="w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-sm uppercase tracking-wider shadow-lg transition-colors cursor-pointer"
             >
               Quiz auswerten & Freischaltung prüfen
             </button>
@@ -824,10 +831,10 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
           <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
             <span className="px-2.5 py-1 rounded-md bg-purple-500/20 text-purple-400 font-black text-xs uppercase tracking-wider">Raum 03: Stationszimmer</span>
             <div className="flex items-center justify-between mt-2">
-              <h2 className="text-xl sm:text-2xl font-black text-white">Akte 06: Die Grenzen der Delegation</h2>
+              <h2 className="text-xl sm:text-2xl font-black text-white">Akte 06: Grenzen der Delegation</h2>
               <button 
                 onClick={() => onUnlockNote && onUnlockNote('easter_egg_shield')}
-                className="text-slate-500 hover:text-amber-400 transition-colors p-1"
+                className="text-slate-500 hover:text-amber-400 transition-colors p-1 cursor-pointer"
                 title="Schutzschild der Pflege untersuchen"
               >
                 <Shield className="w-5 h-5" />
@@ -853,7 +860,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
                 <select 
                   value={case6Answers[task.id]} 
                   onChange={(e) => setCase6Answers({ ...case6Answers, [task.id]: e.target.value })}
-                  className="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-xs sm:text-sm text-slate-200 outline-none focus:border-purple-500"
+                  className="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-xs sm:text-sm text-slate-200 outline-none focus:border-purple-500 cursor-pointer"
                 >
                   <option value="">-- Verantwortungsbereich auswählen --</option>
                   <option value="delegationsverbot">Absolutes Delegationsverbot (Ärztliche Kernaufgabe)</option>
@@ -866,7 +873,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
 
             <button 
               onClick={evaluateCase6}
-              className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-sm uppercase tracking-wider shadow-lg transition-colors"
+              className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-sm uppercase tracking-wider shadow-lg transition-colors cursor-pointer"
             >
               Zuordnung überprüfen
             </button>
@@ -899,7 +906,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
         <div className="space-y-6">
           <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
             <span className="px-2.5 py-1 rounded-md bg-rose-500/20 text-rose-400 font-black text-xs uppercase tracking-wider">Raum 04: Arztzimmer</span>
-            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 07: Das Eskalationsmodell (Willensermittlung)</h2>
+            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 07: Das Eskalationsmodell</h2>
             <p className="text-slate-300 text-sm mt-2 leading-relaxed [text-wrap:pretty]">
               Ein bewusstloser Notfallpatient wird eingeliefert. Ordnen Sie die rechtlichen Stufen der Willensermittlung in die korrekte chronologische Reihenfolge, bevor Sie handeln.
             </p>
@@ -912,11 +919,11 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
                 <select 
                   value={case7Slots[slotNum]} 
                   onChange={(e) => setCase7Slots({ ...case7Slots, [slotNum]: e.target.value })}
-                  className="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-xs sm:text-sm text-slate-200 outline-none focus:border-rose-500"
+                  className="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-xs sm:text-sm text-slate-200 outline-none focus:border-rose-500 cursor-pointer"
                 >
                   <option value="">-- Stufe auswählen --</option>
-                  <option value="mutmasslich">Mutmaßlicher Wille (Ethische Abwägung)</option>
-                  <option value="notfall">Notfallindikation / Vitalgefahr (Sofortiges Handeln)</option>
+                  <option value="mutmasslich">Mutmaßlicher Wille</option>
+                  <option value="notfall">Notfallindikation (Gefahr im Verzug)</option>
                   <option value="betreuer">Gesetzlicher Betreuer / Bevollmächtigter</option>
                   <option value="verfuegung">Suche nach Patientenverfügung</option>
                 </select>
@@ -925,7 +932,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
 
             <button 
               onClick={evaluateCase7}
-              className="w-full py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-sm uppercase tracking-wider shadow-lg transition-colors"
+              className="w-full py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-sm uppercase tracking-wider shadow-lg transition-colors cursor-pointer"
             >
               Reihenfolge überprüfen
             </button>
@@ -943,7 +950,7 @@ export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: Case
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
                     <div>
-                      <strong>Reihenfolge noch nicht ganz richtig.</strong> Chronologie: 1. Notfallindikation → 2. Suche nach Patientenverfügung → 3. Gesetzlicher Betreuer / Vorsorgevollmacht → 4. Mutmaßlicher Wille.
+                      <strong>Reihenfolge noch nicht ganz richtig.</strong> Chronologie: 1. Notfallindikation → 2. Suche nach Patientenverfügung → 3. Gesetzlicher Betreuer / Bevollmächtigter → 4. Mutmaßlicher Wille.
                     </div>
                   </div>
                 )}
@@ -1006,7 +1013,7 @@ E: Starte den Dialog basierend auf diesen Notizen: ${case8Notes || '[Ihre Notize
               href="https://notebook.google.com/notebook/36294d79-a601-4870-a351-53ab8c954ac3" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white rounded-lg text-xs font-bold transition-colors border border-purple-500/40"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white rounded-lg text-xs font-bold transition-colors border border-purple-500/40 cursor-pointer"
             >
               <Bot className="w-4 h-4" /> Zum KI-Helfer in Google NotebookLM
             </a>
@@ -1039,77 +1046,16 @@ E: Meine Notizen: ${case8Notes || '[Ihre Notizen aus Schritt 1]'}`}
               <h3 className="font-bold text-white text-base">Schritt 4: Fobizz Azubi-Board</h3>
             </div>
             <p className="text-slate-300 text-xs sm:text-sm leading-relaxed [text-wrap:pretty]">
-              Kopieren Sie Ihren finalen, rechtssicheren Dokumentationseintrag und posten Sie ihn auf dem digitalen fobizz Azubi-Board:
+              Kopieren Sie Ihren finalen, rechtssicheren Dokumentationseintrag und posten Sie ihn auf dem digitalen fobizz Azubi-Board (Pflegerische Dokumentation & Patientenrechte):
             </p>
 
             <div className="h-96 w-full rounded-xl overflow-hidden border border-slate-700 bg-slate-950">
               <iframe 
                 src="https://tools.fobizz.com/boards/embed/dc44fa12-32b0-466d-8b43-ce066e409b30" 
-                title="fobizz Azubi-Board" 
+                title="Pflegerische Dokumentation & Patientenrechte" 
                 className="w-full h-full border-0"
               ></iframe>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* CASE 09: RAUM 04 ARZTZIMMER (BEWEISLAST & DOKUMENTATION) */}
-      {caseId === 9 && (
-        <div className="space-y-6">
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-            <span className="px-2.5 py-1 rounded-md bg-rose-500/20 text-rose-400 font-black text-xs uppercase tracking-wider">Raum 04: Arztzimmer</span>
-            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 09: Beweislast & Dokumentation</h2>
-            <p className="text-slate-300 text-sm mt-2 leading-relaxed [text-wrap:pretty]">
-              Schützen Sie sich und Patient:innen durch rechtssichere Dokumentationsroutinen.
-            </p>
-          </div>
-
-          {/* Szenario */}
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3">
-            <h3 className="font-bold text-white text-base">Szenario:</h3>
-            <p className="text-slate-200 text-sm leading-relaxed [text-wrap:pretty] bg-slate-950 p-4 rounded-xl border border-slate-800">
-              „Eine Operation ist handwerklich perfekt verlaufen, doch der Patient klagt auf Schmerzensgeld wegen einer angeblich fehlenden Risikoaufklärung. Es steht Aussage gegen Aussage.“
-            </p>
-
-            <h3 className="font-bold text-white text-base pt-2">Arbeitsauftrag:</h3>
-            <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
-              Lesen Sie den In-Game-Auszug zu § 630h BGB. Wer muss in einem Gerichtsprozess beweisen, dass die Aufklärung ordnungsgemäß und rechtzeitig stattgefunden hat? Welche Rolle spielt dabei Ihre Pflegedokumentation?
-            </p>
-
-            {/* In-Game-Reader */}
-            <div className="bg-slate-950 border border-slate-700 p-4 rounded-xl space-y-2">
-              <span className="text-[10px] font-black uppercase tracking-wider text-amber-400">§ 630h BGB (Beweislast bei Haftung für Behandlungs- und Aufklärungsfehler)</span>
-              <p className="text-xs sm:text-sm text-slate-300 font-serif leading-relaxed italic">
-                (2) Der Behandelnde hat zu beweisen, dass er eine Einwilligung gemäß § 630d eingeholt und entsprechend den Anforderungen des § 630e aufgeklärt hat. Genügt die Aufklärung nicht den Anforderungen, kann der Behandelnde sich darauf berufen, dass der Patient auch im Falle einer ordnungsgemäßen Aufklärung in die Maßnahme eingewilligt hätte.
-              </p>
-            </div>
-
-            <StyledTextarea 
-              label="Ihre rechtliche Analyse zur Beweislast"
-              placeholder="Wer trägt die Beweislast? Welche Bedeutung hat die Pflegedokumentation vor Gericht? ('Wer schreibt, der bleibt')..."
-              value={case9Analysis}
-              onChange={(e: any) => setCase9Analysis(e.target.value)}
-              color="rose"
-            />
-
-            <button 
-              onClick={() => setCase9ShowSolution(!case9ShowSolution)}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-700"
-            >
-              {case9ShowSolution ? 'Musterlösung verbergen' : 'Antwort juristisch auswerten / Musterlösung anzeigen'}
-            </button>
-
-            {case9ShowSolution && (
-              <div className="p-5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 text-xs sm:text-sm text-slate-200 space-y-2 animate-in fade-in">
-                <h5 className="font-black text-emerald-400 uppercase tracking-wider text-xs">Musterlösung:</h5>
-                <p>
-                  <strong>Korrekt analysiert!</strong> In der Arzthaftung gilt die <strong>Beweislastumkehr zugunsten des Patienten</strong>. Das Krankenhaus muss beweisen, dass richtig und rechtzeitig aufgeklärt wurde.
-                </p>
-                <p>
-                  Ihre Pflegedokumentation ist hierbei das wichtigste juristische Schutzschild (<em>„Wer schreibt, der bleibt“</em>). Fehlt die Dokumentation in der Patientenakte, geht das Gericht nach § 630h BGB davon aus, dass die Maßnahme oder Aufklärung <strong>nicht stattgefunden hat</strong>.
-                </p>
-              </div>
-            )}
           </div>
         </div>
       )}
