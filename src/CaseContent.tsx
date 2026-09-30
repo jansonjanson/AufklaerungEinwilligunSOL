@@ -1,26 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { CheckCircle2, ExternalLink, Maximize2, Bot, FileText, ArrowRight, Play, Copy, Check, ChevronRight, Lock as LockIcon } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import { 
+  CheckCircle2, 
+  ExternalLink, 
+  Maximize2, 
+  Bot, 
+  FileText, 
+  Play, 
+  Copy, 
+  Check, 
+  Book, 
+  Shield, 
+  Scale, 
+  HelpCircle,
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  X
+} from 'lucide-react';
 
 export const CASES = [
-  { id: 1, roomId: 'empfang', title: 'Akte 01: Das Erstgespräch (Icebreaker)', tag: 'Doku-Start', subtitle: 'Lade das Erstgespräch herunter und fülle es aus.' },
-  { id: 2, roomId: 'empfang', title: 'Akte 02: Die Digitale Zentrale', tag: 'Tool-Intro', subtitle: 'Fobizz Pinnwand als digitales Unterstützungstool.' },
-  { id: 3, roomId: 'zimmer', title: 'Akte 03: Ärztliche vs. Pflegerische Aufklärung', tag: 'Grenzen der Delegation', subtitle: 'Grenzen der Aufklärung und Delegation bei Frau Meinhardt klären.' },
-  { id: 4, roomId: 'zimmer', title: 'Akte 04: Die 4 Säulen der wirksamen Einwilligung', tag: 'Informed Consent', subtitle: 'Informed Consent: Wann ist eine Einwilligung rechtlich bindend?' },
-  { id: 5, roomId: 'zimmer', title: 'Akte 05: Jura-Check (Quiz)', tag: 'Jura-Check', subtitle: 'Patientenzimmer freischalten: Teste dein Rechtswissen!' },
-  { id: 6, roomId: 'buero', title: 'Akte 06: Das Eskalationsmodell bei Einwilligungsunfähigkeit', tag: 'Mutmaßliche Einwilligung', subtitle: 'Der 6-stufige Stufenprozess bei nicht einwilligungsfähigen Patient:innen.' },
-  { id: 7, roomId: 'buero', title: 'Akte 07: Wissenstest: Eskalationsmodell (Quiz)', tag: 'Wissenstest', subtitle: 'Teste dein Wissen zur mutmaßlichen Einwilligung und Willensermittlung.' },
-  { id: 8, roomId: 'pdbuero', title: 'Akte 08: Fallsimulation: Der graue Bereich der Aufklärung', tag: 'Recht & KI-Labor', subtitle: 'Komplexe Fallsimulation: Azubi Emma, Assistenzarzt & Herr Müller.' }
+  { id: 1, roomId: 'anmeldung', title: 'Akte 01: Rechtliche Aspekte der Aufklärung', tag: 'Grundlagen & BGB', subtitle: 'Leseauftrag, BGB-Auszug & die 3 wichtigsten Erkenntnisse.' },
+  { id: 2, roomId: 'anmeldung', title: 'Akte 02: Patientenaufklärung in der Praxis (Videos)', tag: 'Praxis-Videos', subtitle: 'Selbstbestimmungs- vs. Sicherungsaufklärung mit Prof. Frohnhofen.' },
+  { id: 3, roomId: 'patientenzimmer', title: 'Akte 03: Die Prämedikation (Fallvignette)', tag: 'Fallanwendung', subtitle: 'Herr Yilmaz (65) in der OP-Schleuse: Wirksamkeit der Einwilligung.' },
+  { id: 4, roomId: 'patientenzimmer', title: 'Akte 04: Formen der Einwilligung (Mini-Fälle)', tag: 'Einwilligungsformen', subtitle: 'Konkludent, mutmaßlich, ausdrücklich oder Aufklärungsverzicht?' },
+  { id: 5, roomId: 'stationszimmer', title: 'Akte 05: Das große Jura-Quiz', tag: 'Jura-Check', subtitle: 'Körperverletzung, Einwilligungsformen & Geschäftsfähigkeit.' },
+  { id: 6, roomId: 'stationszimmer', title: 'Akte 06: Die Grenzen der Delegation', tag: 'Delegationsrecht', subtitle: 'Was darf die Pflege? Vorbehaltsaufgaben vs. Arztvorbehalt.' },
+  { id: 7, roomId: 'arztzimmer', title: 'Akte 07: Das Eskalationsmodell (Willensermittlung)', tag: 'Eskalationsmodell', subtitle: 'Stufenprozess bei bewusstlosen Patient:innen ordnen.' },
+  { id: 8, roomId: 'arztzimmer', title: 'Akte 08: KI-Labor & Remonstration', tag: 'Recht & KI-Labor', subtitle: 'Fall Herr Chen: Sokratischer Dialog & rechtssichere Dokumentation.' },
+  { id: 9, roomId: 'arztzimmer', title: 'Akte 09: Beweislast & Dokumentation', tag: 'Beweislast (§ 630h)', subtitle: 'Beweislastumkehr vor Gericht & Pflegedokumentation als Schutzschild.' }
 ];
 
 interface CaseViewerProps {
   caseId: number;
+  onCanComplete?: (val: boolean) => void;
+  onUnlockNote?: (noteId: string) => void;
 }
 
-
 const StyledTextarea = ({ label, description, value, onChange, placeholder, step, color = "blue" }: any) => {
-  const [copied, setCopied] = React.useState(false);
+  const [copied, setCopied] = useState(false);
   const handleCopy = () => {
     if (!value) return;
     navigator.clipboard.writeText(value);
@@ -91,23 +109,48 @@ const StyledTextarea = ({ label, description, value, onChange, placeholder, step
 };
 
 const CopyBlock = ({ title, content, titleColor = "text-blue-400" }: any) => {
-  const [copied, setCopied] = React.useState(false);
+  const [copied, setCopied] = useState(false);
   const handleCopy = () => {
     navigator.clipboard.writeText(content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <div className="bg-slate-950 border border-slate-700 p-4 rounded-xl relative group">
+    <div className="bg-slate-950 border border-slate-700 p-4 rounded-xl relative group my-3">
       <div className="flex justify-between items-center mb-3">
         <h5 className={`font-bold ${titleColor} text-sm uppercase tracking-widest`}>{title}</h5>
-        <button onClick={handleCopy} className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white transition-colors" title="In die Zwischenablage kopieren">
-          {copied ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+        <button onClick={handleCopy} className="p-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 text-xs font-bold" title="In die Zwischenablage kopieren">
+          {copied ? <><Check className="w-3.5 h-3.5 text-emerald-500" /> Kopiert</> : <><Copy className="w-3.5 h-3.5" /> Prompt kopieren</>}
         </button>
       </div>
-      <div className="text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed overflow-x-auto">
+      <div className="text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed overflow-x-auto bg-slate-900/80 p-3 rounded-lg border border-slate-800 select-all">
         {content}
       </div>
+    </div>
+  );
+};
+
+const MusterloesungToggle = ({ title = "Musterlösung anzeigen", children, defaultOpen = false }: { title?: string, children: React.ReactNode, defaultOpen?: boolean }) => {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="my-4 bg-emerald-950/20 border border-emerald-500/40 rounded-xl overflow-hidden transition-all shadow-sm">
+      <button 
+        onClick={() => setOpen(!open)}
+        className="w-full p-4 flex items-center justify-between text-left bg-emerald-900/20 hover:bg-emerald-900/30 transition-colors"
+      >
+        <div className="flex items-center gap-2.5">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+          <span className="font-bold text-emerald-300 text-sm">{title}</span>
+        </div>
+        <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider bg-emerald-500/20 px-3 py-1 rounded-md flex items-center gap-1">
+          {open ? <><ChevronUp className="w-3.5 h-3.5" /> Ausblenden</> : <><ChevronDown className="w-3.5 h-3.5" /> Einblenden</>}
+        </span>
+      </button>
+      {open && (
+        <div className="p-4 sm:p-5 border-t border-emerald-500/30 text-xs sm:text-sm text-slate-200 leading-relaxed space-y-3 bg-slate-900/80 animate-in fade-in">
+          {children}
+        </div>
+      )}
     </div>
   );
 };
@@ -150,1372 +193,955 @@ const VideoPlayerBlock = ({ title, youtubeId, subtitle, linkUrl }: { title: stri
   );
 };
 
-export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: CaseViewerProps & { onCanComplete?: (val: boolean) => void, onUnlockNote?: (noteId: string) => void }) {
-  const [hasCopied, setHasCopied] = useState(false);
-  
+export default function CaseViewer({ caseId, onCanComplete, onUnlockNote }: CaseViewerProps) {
+  // Case 1 states
+  const [case1Notes, setCase1Notes] = useState(() => localStorage.getItem('praxis-c1-notes') || '');
+  const [case1ShowSolution, setCase1ShowSolution] = useState(false);
 
-  const [boardModal, setBoardModal] = useState<string | null>(null);
-  const [largeQr, setLargeQr] = useState<string | null>(null);
+  // Case 2 states
+  const [case2DefSelbst, setCase2DefSelbst] = useState(() => localStorage.getItem('praxis-c2-defselbst') || '');
+  const [case2DefSicher, setCase2DefSicher] = useState(() => localStorage.getItem('praxis-c2-defsicher') || '');
+  const [case2ShowSolution, setCase2ShowSolution] = useState(false);
 
-  // States for Akte 03: Ärztliche vs. Pflegerische Aufklärung
-  const [eingriffsAufklaerungText, setEingriffsAufklaerungText] = useState('');
-  const [sicherungsAufklaerungText, setSicherungsAufklaerungText] = useState('');
-  const [therapeutischeAufklaerungText, setTherapeutischeAufklaerungText] = useState('');
+  // Case 3 states
+  const [case3Evaluation, setCase3Evaluation] = useState(() => localStorage.getItem('praxis-c3-eval') || '');
+  const [case3ShowSolution, setCase3ShowSolution] = useState(false);
 
-  // States for Akte 04: Die 4 Säulen der wirksamen Einwilligung
-  const [saeule1, setSaeule1] = useState('');
-  const [saeule2, setSaeule2] = useState('');
-  const [saeule3, setSaeule3] = useState('');
-  const [saeule4, setSaeule4] = useState('');
+  // Case 4 states
+  const [case4S1, setCase4S1] = useState(() => localStorage.getItem('praxis-c4-s1') || '');
+  const [case4S2, setCase4S2] = useState(() => localStorage.getItem('praxis-c4-s2') || '');
+  const [case4S3, setCase4S3] = useState(() => localStorage.getItem('praxis-c4-s3') || '');
+  const [case4S4, setCase4S4] = useState(() => localStorage.getItem('praxis-c4-s4') || '');
+  const [case4ShowSolution, setCase4ShowSolution] = useState(false);
 
-  const [isSaved, setIsSaved] = useState(false);
-  const [showSolution, setShowSolution] = useState(false);
-  const [copied, setCopied] = useState(false);
-  
-  // Quizzes state (Akte 05 Jura-Check & Akte 07 Eskalationsmodell)
-  const [case5QuizStep, setCase5QuizStep] = useState(0);
-  const [juraCheckScore, setJuraCheckScore] = useState(0);
-  const [case5Mistakes, setCase5Mistakes] = useState(0);
-  const [case7QuizStep, setCase7QuizStep] = useState(0);
-  const [case7Score, setCase7Score] = useState(0);
-  const [case7Mistakes, setCase7Mistakes] = useState(0);
-  
-  // Case 8 Notes & States
-  const [case8Notes, setCase8Notes] = useState('');
-  const [case8Einschaetzung, setCase8Einschaetzung] = useState('');
-  const [case8Handlung, setCase8Handlung] = useState('');
-  
-  const [case5Q2Answers, setCase5Q2Answers] = useState<Record<string, boolean>>({});
-  const [case5Q3Text, setCase5Q3Text] = useState('');
-  
-  const [case7Q2Answers, setCase7Q2Answers] = useState<Record<string, boolean>>({});
-  const [case7Q4Slots, setCase7Q4Slots] = useState<Record<number, string>>({});
-  const [case5Feedback, setCase5Feedback] = useState<{msg: string, isError: boolean, showNext?: boolean} | null>(null);
-  const [case7Feedback, setCase7Feedback] = useState<{msg: string, isError: boolean, showNext?: boolean} | null>(null);
+  // Case 5 states (Quiz)
+  const [case5Q1, setCase5Q1] = useState<string | null>(null);
+  const [case5Q2, setCase5Q2] = useState<{ [key: string]: boolean }>({ A: false, B: false, C: false, D: false, E: false });
+  const [case5Q3, setCase5Q3] = useState<boolean | null>(null);
+  const [case5Q4, setCase5Q4] = useState<string | null>(null);
+  const [case5Submitted, setCase5Submitted] = useState(false);
+  const [case5Passed, setCase5Passed] = useState(false);
 
-  React.useEffect(() => {
-    setIsSaved(false);
-    setHasCopied(false);
-  }, [caseId]);
-  
-  React.useEffect(() => {
-    if (caseId === 5 && case5QuizStep === 4 && juraCheckScore === 4) {
-      if (case5Mistakes === 0) {
-        confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 }, colors: ['#fbbf24', '#f59e0b', '#d97706'] });
-        if (onUnlockNote) onUnlockNote('badge_expert_5');
-      } else {
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-      }
-    }
-  }, [caseId, case5QuizStep, juraCheckScore, case5Mistakes, onUnlockNote]);
+  // Case 6 states (Delegation)
+  const [case6Answers, setCase6Answers] = useState<{ [key: number]: string }>({ 1: '', 2: '', 3: '', 4: '' });
+  const [case6Submitted, setCase6Submitted] = useState(false);
+  const [case6Passed, setCase6Passed] = useState(false);
 
-  React.useEffect(() => {
-    if (caseId === 7 && case7QuizStep === 4 && case7Score === 4) {
-      if (case7Mistakes === 0) {
-        confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 }, colors: ['#fbbf24', '#f59e0b', '#d97706'] });
-        if (onUnlockNote) onUnlockNote('badge_expert_7');
-      } else {
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-      }
-    }
-  }, [caseId, case7QuizStep, case7Score, case7Mistakes, onUnlockNote]);
+  // Case 7 states (Eskalationsmodell Order)
+  const [case7Slots, setCase7Slots] = useState<{ [key: number]: string }>({ 1: '', 2: '', 3: '', 4: '' });
+  const [case7Submitted, setCase7Submitted] = useState(false);
+  const [case7Passed, setCase7Passed] = useState(false);
 
-  React.useEffect(() => {
-    if (caseId === 5) {
-      if (onCanComplete) onCanComplete(case5QuizStep === 4);
+  // Case 8 states
+  const [case8Notes, setCase8Notes] = useState(() => localStorage.getItem('praxis-c8-notes') || '');
+  const [case8ShowSolution, setCase8ShowSolution] = useState(false);
+
+  // Case 9 states
+  const [case9Analysis, setCase9Analysis] = useState(() => localStorage.getItem('praxis-c9-analysis') || '');
+  const [case9ShowSolution, setCase9ShowSolution] = useState(false);
+
+  // Save changes
+  useEffect(() => { localStorage.setItem('praxis-c1-notes', case1Notes); }, [case1Notes]);
+  useEffect(() => { localStorage.setItem('praxis-c2-defselbst', case2DefSelbst); }, [case2DefSelbst]);
+  useEffect(() => { localStorage.setItem('praxis-c2-defsicher', case2DefSicher); }, [case2DefSicher]);
+  useEffect(() => { localStorage.setItem('praxis-c3-eval', case3Evaluation); }, [case3Evaluation]);
+  useEffect(() => { localStorage.setItem('praxis-c4-s1', case4S1); }, [case4S1]);
+  useEffect(() => { localStorage.setItem('praxis-c4-s2', case4S2); }, [case4S2]);
+  useEffect(() => { localStorage.setItem('praxis-c4-s3', case4S3); }, [case4S3]);
+  useEffect(() => { localStorage.setItem('praxis-c4-s4', case4S4); }, [case4S4]);
+  useEffect(() => { localStorage.setItem('praxis-c8-notes', case8Notes); }, [case8Notes]);
+  useEffect(() => { localStorage.setItem('praxis-c9-analysis', case9Analysis); }, [case9Analysis]);
+
+  // Completion criteria handling
+  useEffect(() => {
+    if (!onCanComplete) return;
+
+    if (caseId === 1) {
+      onCanComplete(case1Notes.trim().length > 10);
+    } else if (caseId === 2) {
+      onCanComplete(case2DefSelbst.trim().length > 5 && case2DefSicher.trim().length > 5);
+    } else if (caseId === 3) {
+      onCanComplete(case3Evaluation.trim().length > 10);
+    } else if (caseId === 4) {
+      onCanComplete(case4S1.trim().length > 2 && case4S2.trim().length > 2 && case4S3.trim().length > 2 && case4S4.trim().length > 2);
+    } else if (caseId === 5) {
+      onCanComplete(case5Passed);
+    } else if (caseId === 6) {
+      onCanComplete(case6Passed);
     } else if (caseId === 7) {
-      if (onCanComplete) onCanComplete(case7QuizStep === 4);
-    } else {
-      if (onCanComplete) onCanComplete(true);
+      onCanComplete(case7Passed);
+    } else if (caseId === 8) {
+      onCanComplete(case8Notes.trim().length > 10);
+    } else if (caseId === 9) {
+      onCanComplete(case9Analysis.trim().length > 10);
     }
-  }, [caseId, case5QuizStep, case7QuizStep, onCanComplete]);
+  }, [
+    caseId, 
+    case1Notes, 
+    case2DefSelbst, 
+    case2DefSicher, 
+    case3Evaluation, 
+    case4S1, 
+    case4S2, 
+    case4S3, 
+    case4S4, 
+    case5Passed, 
+    case6Passed, 
+    case7Passed, 
+    case8Notes, 
+    case9Analysis, 
+    onCanComplete
+  ]);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(`Rechtliche Aufklärung & Delegation (Frau Meinhardt):\n\n1. Eingriffsaufklärung (Arztvorbehalt):\n${eingriffsAufklaerungText}\n\n2. Sicherungsaufklärung (Pflegeaufgabe):\n${sicherungsAufklaerungText}\n\n3. Therapeutische Aufklärung (Interprofessionell):\n${therapeutischeAufklaerungText}`);
-    setCopied(true);
-    setHasCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  // Case 5 validation
+  const evaluateCase5 = () => {
+    const q1Correct = case5Q1 === 'B';
+    const q2Correct = case5Q2.A === true && case5Q2.B === false && case5Q2.C === true && case5Q2.D === false && case5Q2.E === true;
+    const q3Correct = case5Q3 === false; // Falsch ist die richtige Antwort
+    const q4Correct = case5Q4 === 'B';
 
-  const handleCopyCase4 = () => {
-    navigator.clipboard.writeText(`Die 4 Säulen der wirksamen Einwilligung (Informed Consent):\n\nSäule 1 (Einwilligungsfähigkeit):\n${saeule1}\n\nSäule 2 (Aufklärung):\n${saeule2}\n\nSäule 3 (Freiwilligkeit):\n${saeule3}\n\nSäule 4 (Widerruflichkeit):\n${saeule4}`);
-    setCopied(true);
-    setHasCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+    const allCorrect = q1Correct && q2Correct && q3Correct && q4Correct;
+    setCase5Submitted(true);
+    setCase5Passed(allCorrect);
 
-    const renderBoard = (url: string, title: string) => {
-    const rawUrl = url.replace('?embed=true&', '?');
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(rawUrl)}`;
-    
-    let password = null;
-    if (title.toLowerCase().includes('pa-team')) {
-      password = 'Praxisanleitung';
-    } else if (title.toLowerCase().includes('azubi')) {
-      password = 'Auszubildende';
-    }
-
-    return (
-      <div className="bg-slate-800 p-4 sm:p-6 rounded-xl border border-slate-700 my-6 shadow-lg">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
-          <div>
-            <h4 className="text-amber-500 font-bold text-lg mb-2 [text-wrap:balance]">{title}</h4>
-            <div className="flex flex-wrap gap-2 mb-2">
-              <button onClick={() => setBoardModal(url)} className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-900 hover:bg-slate-950 border border-slate-600 rounded-lg text-sm text-white transition-colors">
-                <Maximize2 className="w-4 h-4" /> Vollbild
-              </button>
-              <a href={rawUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 border border-amber-500/30 rounded-lg text-sm transition-colors">
-                <ExternalLink className="w-4 h-4" /> Neuen Tab öffnen
-              </a>
-            </div>
-            {password && (
-              <p className="text-sm text-slate-300 mt-2">
-                Passwort: <strong className="text-amber-500 font-mono tracking-wider">{password}</strong>
-              </p>
-            )}
-          </div>
-          <button 
-            onClick={() => setLargeQr(qrUrl)}
-            className="bg-white p-2 rounded shadow-md shrink-0 self-start sm:self-auto hover:scale-105 transition-transform cursor-pointer border-2 border-transparent hover:border-amber-500"
-            title="QR Code vergrößern"
-          >
-            <img src={qrUrl} alt={`QR Code ${title}`} className="w-16 h-16" />
-          </button>
-        </div>
-        <div className="w-full h-[500px] bg-slate-900 rounded-lg overflow-hidden border border-slate-600 relative">
-          <iframe src={url} frameBorder="0" className="absolute inset-0 w-full h-full" allowFullScreen></iframe>
-        </div>
-      </div>
-    );
-  };
-
-  const renderContent = () => {
-    const renderDocumentationStep = (stepNumber: string | number, name: string) => (
-    <div className="flex gap-4 p-4 bg-blue-900/20 rounded-xl border border-blue-500/30 mt-6">
-      <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold shrink-0">{stepNumber}</div>
-      <div className="w-full">
-        <h4 className="font-bold text-blue-400 mb-1 [text-wrap:balance]">Praxisanleitungsnachweis dokumentieren</h4>
-        <p className="text-sm text-slate-300 mb-4 leading-relaxed [text-wrap:pretty]">
-          Lade dir nach Erfüllung der aktuellen Arbeitsaufträge das Dokument "Praxisanleitungsnachweis" herunter und fülle es für {name} aus. Lade es anschließend auf dem fobizz Auszubildenden-Board in der Spalte für {name} hoch.
-        </p>
-        <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-700/50 mb-4 space-y-2 text-sm text-slate-300">
-          <p className="font-bold text-slate-200">So gehst du vor:</p>
-          <ol className="list-decimal pl-5 space-y-1">
-            <li>Klicke in Spalte "{name}" auf <strong>Karte hinzufügen</strong>.</li>
-            <li>Gib der Karte einen Namen (z. B. "{name} Praxisanleitungsnachweis").</li>
-            <li>Klicke auf <strong>Anlegen</strong>.</li>
-            <li>Klicke die neue Karte an und lade dein Dokument unter Anhänge hoch (Dokument per Drag & Drop hochladen oder ein Klick auf „Hinzufügen“ und Datei auswählen).</li>
-            <li>Klicke abschließend auf <strong>Speichern</strong>.</li>
-          </ol>
-        </div>
-        <div className="flex flex-wrap gap-3 mb-4">
-          <a href="https://github.com/jansonjanson/assetsdokufeedbackreflexion/raw/main/Praxisanleitung.docx" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors shadow-lg text-sm">
-            <FileText className="w-4 h-4" /> Download Nachweis
-          </a>
-        </div>
-        {renderBoard("https://app.fobizz.com/pinboard/public_boards/b28a4a86-0543-419d-8d4e-df64affde584?embed=true&token=e57c9cbe6f87eb5d8ee67f6eeacd3cb8", "fobizz Azubi-Board")}
-      </div>
-    </div>
-  );
-
-  switch (caseId) {
-      case 1:
-        return (
-          <div className="space-y-6">
-            <div className="bg-slate-800 p-6 rounded-xl border-l-4 border-l-blue-500 shadow-md">
-              <h3 className="font-bold text-lg mb-2 text-white [text-wrap:balance]">Was erwartet dich hier?</h3>
-              <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
-                Wir lernen uns kennen, indem wir den Erstgesprächsbogen ausfüllen. Wir lernen das erste Beispiel für ein Dokumentationsformular in der Ausbildung kennen und beschäftigen uns bereits einmal kurz mit einem digitalen Unterstützungstool (unserem Fobizz PA-Board). 
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <h4 className="font-black text-amber-500 uppercase tracking-widest text-sm mb-4 [text-wrap:balance]">Dein Auftrag</h4>
-              
-              <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-                <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-black flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20">1</div>
-                <div className="pt-1 w-full">
-                  <p className="text-slate-200 font-bold mb-2">Lade das Dokument „Erstgespräch“ herunter.</p>
-                  <a href="https://github.com/jansonjanson/assetsdokufeedbackreflexion/blob/main/Erstgespr%C3%A4ch.docx?raw=true" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white rounded-lg font-bold text-sm transition-colors border border-blue-500/30 mb-4">
-                    <FileText className="w-4 h-4" /> Direktdownload (.docx)
-                  </a>
-                  <p className="text-slate-300 text-sm mb-4 leading-relaxed [text-wrap:pretty]">Alternativ kannst du das Dokument auch hier vom fobizz PA-Team Board herunterladen. Beide Wege stehen dir im Alltag offen.</p>
-                  {renderBoard("https://app.fobizz.com/pinboard/public_boards/cbb73434-0114-4ee8-853d-31788b459d34?embed=true&token=b0cbca55223b034ebf4f4d6038851b70", "fobizz PA-Team Board")}
-                </div>
-              </div>
-              <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-                <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-900 font-black flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/20">2</div>
-                <div className="pt-1">
-                  <p className="text-slate-200 font-bold">Fülle das Dokument für dich aus.</p>
-                  <p className="text-slate-300 text-sm mt-2 leading-relaxed [text-wrap:pretty]">Trage deinen Namen und deinen "Praxiseinsatzort" (also dort, wo du tätig bist) ein. Fülle dann die ersten beiden Kategorien <strong>"Reflexion der Ausbildungssituation"</strong> und <strong>"Ziele des Praxiseinsatzes"</strong> aus. Den restlichen Teil kannst du auslassen, bitte sieh ihn dir aber einmal an und lies ihn dir durch.</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-                <div className="w-8 h-8 rounded-full bg-emerald-500 text-slate-900 font-black flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">3</div>
-                <div className="pt-1 w-full">
-                  <p className="text-slate-200 font-bold mb-2">Lade es in der Spalte „Upload Icebreaker Erstgespräch“ wieder hoch.</p>
-                  <p className="text-slate-300 text-sm mb-4 leading-relaxed [text-wrap:pretty]">Nutze dafür das eingebettete fobizz PA-Team Board hier unten (oder öffne es im neuen Tab).</p>
-                  
-                  <div className="bg-slate-900 border border-slate-700 p-4 rounded-lg flex flex-col gap-2 mb-4">
-                    <p className="font-bold text-slate-200 mb-2 text-sm">So gehst du vor:</p>
-                    <div className="flex items-start gap-2 text-sm text-slate-300"><ChevronRight className="w-4 h-4 text-amber-500 shrink-0 mt-0.5"/> <span>Klicke in Spalte „Upload Icebreaker Erstgespräch“ auf <strong>Karte hinzufügen</strong></span></div>
-                    <div className="flex items-start gap-2 text-sm text-slate-300"><ChevronRight className="w-4 h-4 text-amber-500 shrink-0 mt-0.5"/> <span>Gib der Karte einen Namen (z. B. "DEIN NAME")</span></div>
-                    <div className="flex items-start gap-2 text-sm text-slate-300"><ChevronRight className="w-4 h-4 text-amber-500 shrink-0 mt-0.5"/> <span>Klicke auf <strong>Anlegen</strong></span></div>
-                    <div className="flex items-start gap-2 text-sm text-slate-300"><ChevronRight className="w-4 h-4 text-amber-500 shrink-0 mt-0.5"/> <span>Klicke die neue Karte an und lade dein Dokument unter Anhänge hoch (Dokument per Drag & Drop hochladen oder ein Klick auf „Hinzufügen“ und Datei auswählen).</span></div>
-                    <div className="flex items-start gap-2 text-sm text-slate-300"><ChevronRight className="w-4 h-4 text-amber-500 shrink-0 mt-0.5"/> <span>Klicke abschließend auf <strong>Speichern</strong>.</span></div>
-                  </div>
-
-                  {renderBoard("https://app.fobizz.com/pinboard/public_boards/cbb73434-0114-4ee8-853d-31788b459d34?embed=true&token=b0cbca55223b034ebf4f4d6038851b70", "fobizz PA-Team Board")}
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-                <div className="w-8 h-8 rounded-full bg-purple-500 text-white font-black flex items-center justify-center shrink-0 shadow-lg shadow-purple-500/20">4</div>
-                <div className="pt-1">
-                  <p className="text-slate-200 font-bold">Wir treffen uns im Plenum und gehen die Bögen gemeinsam durch.</p>
-                  <p className="text-slate-300 text-sm mt-1 leading-relaxed [text-wrap:pretty]">Warte auf das Signal der Kursleitung.</p>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        );
-      case 2:
-        return (
-          <div className="space-y-6">
-            <div className="bg-slate-800 p-6 rounded-xl border-l-4 border-l-amber-500 shadow-md">
-              <h3 className="font-bold text-lg mb-2 text-white [text-wrap:balance]">Was erwartet dich hier?</h3>
-              <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
-                Hier lernst du ein Beispiel für digitale Unterstützung kennen: Die <strong>fobizz Pinnwand</strong>, unser digitales Unterstützungstool für die Praxisanleitung, Dokumentation, Feedback und Reflexion. Es gibt viele weitere Tools auf dem Markt, aber wir arbeiten exemplarisch mit diesem. Es bietet kostenlos viele Features an und ist DSGVO-konform.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <h4 className="font-black text-amber-500 uppercase tracking-widest text-sm mb-4 [text-wrap:balance]">Dein Auftrag</h4>
-
-              <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-                <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-black flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20">1</div>
-                <div className="pt-1 w-full">
-                  <p className="text-slate-200 font-bold mb-4">Intro-Video ansehen</p>
-                  <a href="https://app.fobizz.com/pinboard/info" target="_blank" rel="noopener noreferrer" className="block group">
-                    <div className="bg-slate-800 border-2 border-slate-700 hover:border-amber-500 rounded-xl p-8 flex flex-col items-center justify-center gap-4 transition-all hover:shadow-[0_0_30px_rgba(245,158,11,0.2)]">
-                      <div className="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center text-slate-900 group-hover:scale-110 transition-transform shadow-lg">
-                        <Play className="w-8 h-8 ml-1" />
-                      </div>
-                      <div className="text-center">
-                        <h4 className="text-white font-bold text-lg mb-1 [text-wrap:balance]">Einführungsvideo öffnen</h4>
-                        <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">Öffnet im neuen Tab</p>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-                <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-900 font-black flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/20">2</div>
-                <div className="pt-1 w-full">
-                  <p className="text-slate-200 font-bold mb-2">Beide Boards besuchen</p>
-                  <p className="text-slate-300 text-sm mb-4 leading-relaxed [text-wrap:pretty]">Klicke dich durch die Funktionen, sieh dir die Spalten an und teste die Tools.</p>
-                  {renderBoard("https://app.fobizz.com/pinboard/public_boards/cbb73434-0114-4ee8-853d-31788b459d34?embed=true&token=b0cbca55223b034ebf4f4d6038851b70", "1. fobizz PA-Team Board")}
-                  {renderBoard("https://app.fobizz.com/pinboard/public_boards/b28a4a86-0543-419d-8d4e-df64affde584?embed=true&token=e57c9cbe6f87eb5d8ee67f6eeacd3cb8", "2. fobizz Azubi-Board")}
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-                <div className="w-8 h-8 rounded-full bg-emerald-500 text-slate-900 font-black flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">3</div>
-                <div className="pt-1">
-                  <p className="text-slate-200 font-bold">Austausch im Plenum</p>
-                  <p className="text-slate-300 text-sm mt-1 leading-relaxed [text-wrap:pretty]">Es folgt eine kurze Einführung und Beantwortung von Fragen durch den Trainer.</p>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        );
-      
-      
-      case 3:
-        return (
-          <div className="space-y-6">
-            <div className="bg-slate-800 p-6 rounded-xl border-l-4 border-l-blue-500 shadow-md">
-              <h3 className="font-bold text-lg mb-2 text-white [text-wrap:balance]">Akte 03: Ärztliche vs. Pflegerische Aufklärung (Grenzen der Delegation)</h3>
-              <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
-                Aufklärung ist nicht gleich Aufklärung. Wir unterscheiden streng zwischen der Risiko-/Eingriffsaufklärung (z.B. vor einer OP) und der Sicherungsaufklärung (z.B. Anleitung zur Sturzprophylaxe). Fülle die Felder für eine Auszubildende (Frau Meinhardt) aus, um die Grenzen zu klären.
-              </p>
-            </div>
-            
-            <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-              <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-black flex items-center justify-center shrink-0">1</div>
-              <div className="pt-1 w-full">
-                <p className="text-slate-200 font-bold text-sm mb-2">Rechtlicher Hintergrund: Die zwei Arten der Aufklärung</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300">
-                  <div className="bg-slate-800/90 p-4 rounded-xl border border-slate-700">
-                    <strong className="text-blue-400 font-bold block text-sm mb-1 uppercase tracking-wider">Eingriffs- / Risikoaufklärung (§ 630e BGB)</strong>
-                    <p className="leading-relaxed">Reiner <strong>Arztvorbehalt</strong>! Umfasst Diagnose, Art, Umfang, Durchführung, zu erwartende Folgen und Risiken der Maßnahme sowie Alternativen. Darf <em>niemals</em> an die Pflege oder Auszubildende delegiert werden.</p>
-                  </div>
-                  <div className="bg-slate-800/90 p-4 rounded-xl border border-slate-700">
-                    <strong className="text-emerald-400 font-bold block text-sm mb-1 uppercase tracking-wider">Sicherungs- / Therapieaufklärung (§ 630c BGB)</strong>
-                    <p className="leading-relaxed"><strong>Originäre Pflegeaufgabe</strong>! Aufklärung über therapiegerechtes Verhalten zur Vermeidung von Selbstgefährdung (z.B. Sturz, Dekubitus, Einhaltung von Bettruhe, Umgang mit Hilfsmitteln).</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Quelltext-Einbindung */}
-            <div className="bg-blue-950/40 border border-blue-500/40 p-4 sm:p-5 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
-                  <FileText className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded">Fachliteratur</span>
-                    <h4 className="font-bold text-white text-sm sm:text-base">Quelltext: Leitfaden Aufklärungsgespräch (PDF)</h4>
-                  </div>
-                  <p className="text-xs text-slate-300 mt-1 leading-relaxed [text-wrap:pretty]">
-                    Zentraler Text zum Aufklärungsgespräch: Rechtliche Rahmenbedingungen (§ 630e BGB), Pflichten des Behandlers und Grenzen der pflegerischen Mitwirkung.
-                  </p>
-                </div>
-              </div>
-              <a 
-                href="https://github.com/jansonjanson/AufklaerungEinwilligunSOL/blob/main/Aufklaerungsgespraech.pdf" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-xs sm:text-sm transition-colors shadow-lg"
-              >
-                <FileText className="w-4 h-4" /> Quelltext (PDF) ansehen <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            </div>
-
-            {/* Lehrvideo 1: Juristische Aspekte */}
-            <VideoPlayerBlock 
-              title="Juristische Aspekte der Patientenaufklärung" 
-              subtitle="Aufklärungspflicht, Beweislastumkehr (§ 630h BGB) und unzulässige Delegation" 
-              youtubeId="sg50e_i_PT8" 
-              linkUrl="https://youtu.be/sg50e_i_PT8?si=nvHiyiHJ7gEWW5Dt" 
-            />
-
-            <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800 relative">
-              <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-900 font-black flex items-center justify-center shrink-0 z-10">2</div>
-              <div className="pt-1 w-full z-10">
-                <h4 className="font-black text-white text-base mb-2 [text-wrap:balance]">Fallkonstellation: Bewohnerin Frau Meinhardt</h4>
-                <div className="bg-slate-800 p-5 rounded-xl border-l-4 border-l-amber-500 shadow-md">
-                  <p className="text-slate-300 text-sm leading-relaxed mb-3 [text-wrap:pretty]">
-                    Frau Meinhardt (79 Jahre) soll eine Bluttransfusion erhalten. Gleichzeitig besteht bei ihr ein akutes Sturzrisiko und postoperative Wundschmerzen nach einem chirurgischen Eingriff. Deine Auszubildende fragt dich unsicher: <em>„Schwester, der Arzt hat gesagt, ich soll Frau Meinhardt den Bogen für die Bluttransfusion unterschreiben lassen und ihr alles erklären. Außerdem weiß ich nicht, was ich zum Sturzrisiko und den Schmerzmitteln sagen und dokumentieren darf.“</em>
-                  </p>
-                  <p className="text-amber-400 text-xs font-bold bg-amber-500/10 p-3 rounded-lg border border-amber-500/20">
-                    Deine pädagogische Aufgabe: Erarbeite mit deiner Auszubildenden die glasklare Trennung der Verantwortungsbereiche.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800 relative overflow-hidden group">
-              <div className="w-8 h-8 rounded-full bg-emerald-500 text-slate-900 font-black flex items-center justify-center shrink-0 z-10">3</div>
-              <div className="w-full z-10">
-                <h4 className="font-bold text-white mb-2 [text-wrap:balance]">Praxis-Leitfaden ausfüllen</h4>
-                <p className="text-sm text-slate-300 mb-4 leading-relaxed [text-wrap:pretty]">Formuliere die Antworten für deine Auszubildende, um die Grenzen der Aufklärung zu definieren:</p>
-                {!isSaved ? (
-                  <div className="space-y-4">
-                    <StyledTextarea 
-                      color="blue" 
-                      label="1. Eingriffsaufklärung (Arztvorbehalt)" 
-                      step="A" 
-                      description="Beispiel: Einwilligung in eine Bluttransfusion. Was ist hierbei die Aufgabe der Pflege? (Fokus: Assistenz, Sicherstellung der ärztl. Aufklärung, nicht die Durchführung!)"
-                      value={eingriffsAufklaerungText} 
-                      onChange={(e: any) => setEingriffsAufklaerungText(e.target.value)} 
-                      placeholder="Aufgabe der Pflege bei der Transfusion beschreiben..." 
-                    />
-                    <StyledTextarea 
-                      color="amber" 
-                      label="2. Sicherungsaufklärung (Pflegeaufgabe)" 
-                      step="B" 
-                      description="Beispiel: Aufklärung über das Sturzrisiko und die Bettgitter-Nutzung. Formuliere einen kurzen Dokumentationseintrag."
-                      value={sicherungsAufklaerungText} 
-                      onChange={(e: any) => setSicherungsAufklaerungText(e.target.value)} 
-                      placeholder="Muster-Dokumentationseintrag zur Sicherungsaufklärung formulieren..." 
-                    />
-                    <StyledTextarea 
-                      color="emerald" 
-                      label="3. Therapeutische Aufklärung (Gemeinsam/Interprofessionell)" 
-                      step="C" 
-                      description="Beispiel: Umgang mit postoperativen Schmerzen. Welche Informationen gibst du dem Patienten?"
-                      value={therapeutischeAufklaerungText} 
-                      onChange={(e: any) => setTherapeutischeAufklaerungText(e.target.value)} 
-                      placeholder="Aufklärung über Schmerztherapie und -äußerung formulieren..." 
-                    />
-                    <div className="flex justify-end">
-                      <button onClick={() => setIsSaved(true)} className="px-6 py-2 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold rounded-lg shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Speichern</button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="bg-slate-950 border border-slate-700 p-4 rounded-xl relative">
-                    <div className="space-y-4 pr-10">
-                      <div><strong className="text-blue-400 block text-xs uppercase tracking-widest mb-1">Eingriffsaufklärung (Arztvorbehalt):</strong><p className="text-slate-300 text-sm whitespace-pre-wrap leading-relaxed [text-wrap:pretty]">{eingriffsAufklaerungText || "Keine Eingabe"}</p></div>
-                      <div><strong className="text-amber-400 block text-xs uppercase tracking-widest mb-1">Sicherungsaufklärung (Pflegeaufgabe):</strong><p className="text-slate-300 text-sm whitespace-pre-wrap leading-relaxed [text-wrap:pretty]">{sicherungsAufklaerungText || "Keine Eingabe"}</p></div>
-                      <div><strong className="text-emerald-400 block text-xs uppercase tracking-widest mb-1">Therapeutische Aufklärung (Gemeinsam):</strong><p className="text-slate-300 text-sm whitespace-pre-wrap leading-relaxed [text-wrap:pretty]">{therapeutischeAufklaerungText || "Keine Eingabe"}</p></div>
-                    </div>
-                    <div className="mt-4 pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                      <button onClick={() => setIsSaved(false)} className="text-xs text-slate-400 hover:text-slate-300">Erneut bearbeiten</button>
-                      {!hasCopied && (
-                        <button onClick={handleCopy} className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-900 font-black rounded-lg shadow-[0_0_15px_rgba(245,158,11,0.5)] transition-all flex items-center gap-2 animate-pulse uppercase tracking-widest text-sm"><Copy className="w-5 h-5" /> Leitfaden jetzt kopieren</button>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            {hasCopied && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-top-4">
-                <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-                  <div className="w-8 h-8 rounded-full bg-purple-500 text-white font-black flex items-center justify-center shrink-0">4</div>
-                  <div className="pt-1 w-full">
-                    <h4 className="font-bold text-white mb-2 [text-wrap:balance]">Abgleich & Musterlösung</h4>
-                    <p className="text-sm text-slate-300 mb-4 leading-relaxed [text-wrap:pretty]">Vergleiche deine Formulierungen mit den rechtlichen Standards.</p>
-                    {!showSolution ? (
-                      <button onClick={() => setShowSolution(true)} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-bold transition-colors">Musterlösung einblenden</button>
-                    ) : (
-                      <div className="bg-slate-950 border-2 border-emerald-500/50 p-6 rounded-xl animate-in fade-in slide-in-from-top-2">
-                        <h5 className="font-black text-emerald-500 mb-4 uppercase tracking-widest text-sm [text-wrap:balance]">Juristische Musterlösung (Rechtliche Leitplanken)</h5>
-                        <div className="space-y-4">
-                          <div>
-                            <strong className="text-white">1. Eingriffsaufklärung (Arztvorbehalt – Bluttransfusion):</strong>
-                            <p className="text-slate-300 text-sm mt-1 leading-relaxed [text-wrap:pretty]">
-                              „Die Risikoaufklärung über eine Transfusion (Risiko von Unverträglichkeiten, Infektionen, Antikörperbildung) ist absolut <strong>nicht delegationsfähig</strong>. Die Pflege darf den Bogen keinesfalls selbst mit der Patientin ausfüllen oder sie zur Unterschrift drängen. Aufgabe der Pflege: Vorbereitung der Unterlagen, Prüfung vor Transfusion, ob die ärztliche Aufklärung und schriftliche Einwilligung in der Akte vorliegt (Sorgfaltspflicht!), Bedside-Test-Assistenz, lückenlose Vitalzeichenüberwachung und Begleitung.“
-                            </p>
-                            <p className="text-emerald-400/80 text-xs mt-1 italic">Rechtlicher Grundsatz: Bei unzulässiger Delegation haftet der anordnende Arzt UND die ausführende Pflegekraft (Übernahme- und Durchführungsverantwortung)!</p>
-                          </div>
-                          <div className="h-px bg-slate-800"></div>
-                          <div>
-                            <strong className="text-white">2. Sicherungsaufklärung (Pflegeaufgabe – Sturzprophylaxe & Bettgitter):</strong>
-                            <p className="text-slate-300 text-sm mt-1 leading-relaxed [text-wrap:pretty]">
-                              <em>Muster-Doku:</em> „14:30 Uhr: Pat. ausführlich über erhöhtes Sturzrisiko infolge Sedierung/Schwäche aufgeklärt. Klingel in unmittelbare Reichweite platziert und Pat. instruiert, vor jedem Aufstehversuch zwingend die Pflege zu rufen. Pat. zeigt volles Verständnis und willigt ein, nicht selbstständig aufzustehen. Bett in Tiefstposition gebracht. (Hinweis: Bettgitter als freiheitsentziehende Maßnahme nur mit richterlicher Genehmigung oder ausdrücklicher informierter Einwilligung zulässig). Gez. Pflegefachkraft.“
-                            </p>
-                            <p className="text-emerald-400/80 text-xs mt-1 italic">Rechtlicher Grundsatz: Wer schreibt, der bleibt! Unterbleibt die Dokumentation, gilt die Aufklärung vor Gericht als nicht erfolgt (§ 630h Abs. 3 BGB Beweislastumkehr).</p>
-                          </div>
-                          <div className="h-px bg-slate-800"></div>
-                          <div>
-                            <strong className="text-white">3. Therapeutische Aufklärung (Umgang mit postoperativen Schmerzen):</strong>
-                            <p className="text-slate-300 text-sm mt-1 leading-relaxed [text-wrap:pretty]">
-                              „Pat. über Schmerzerfassung per NRS (Numerische Rating-Skala 0–10) informiert. Wichtigkeit der frühzeitigen Meldung von Schmerzen erklärt, bevor Schmerzspitzen entstehen. Aufklärung über Wirkweise des verordneten Bedarfsanalgetikums, mögliche Nebenwirkungen (z.B. Übelkeit, Müdigkeit) und ergänzende nicht-medikamentöse Maßnahmen (Lagerung, Schonhaltung vermeiden).“
-                            </p>
-                          </div>
-                        </div>
-                        <button onClick={() => setShowSolution(false)} className="text-slate-400 hover:text-slate-300 text-sm mt-2 font-bold">Ausblenden</button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-                  <div className="w-8 h-8 rounded-full bg-cyan-500 text-white font-black flex items-center justify-center shrink-0">5</div>
-                  <div className="pt-1 w-full">
-                    <h4 className="font-bold text-white mb-2 [text-wrap:balance]">Dokumentiere im PA-Team Board</h4>
-                    <p className="text-sm text-slate-300 mb-4 leading-relaxed [text-wrap:pretty]">Kopiere deinen finalen Text und wechsle über den Link in unser fobizz PA-Team Board. Lege dort unter der Spalte „Frau Meinhardt“ eine neue Karte an, damit auch deine Kolleg:innen im nächsten Dienst Bescheid wissen.</p>
-                    <div className="bg-slate-900 border border-slate-700 p-4 rounded-lg flex flex-col gap-2 mb-4">
-                      <div className="flex items-start gap-2 text-sm text-slate-300"><ChevronRight className="w-4 h-4 text-amber-500 shrink-0 mt-0.5"/> <span>Klicke in Spalte "Frau Meinhardt" auf <strong>Karte hinzufügen</strong></span></div>
-                      <div className="flex items-start gap-2 text-sm text-slate-300"><ChevronRight className="w-4 h-4 text-amber-500 shrink-0 mt-0.5"/> <span>Gib der Karte einen Namen (z. B. "Frau Meinhardt Aufklärung & Delegation")</span></div>
-                      <div className="flex items-start gap-2 text-sm text-slate-300"><ChevronRight className="w-4 h-4 text-amber-500 shrink-0 mt-0.5"/> <span>Klicke auf <strong>Anlegen</strong></span></div>
-                      <div className="flex items-start gap-2 text-sm text-slate-300"><ChevronRight className="w-4 h-4 text-amber-500 shrink-0 mt-0.5"/> <span>Klicke die neue Karte an und füge deinen Text unter <strong>Beschreibung</strong> ein</span></div>
-                      <div className="flex items-start gap-2 text-sm text-slate-300"><ChevronRight className="w-4 h-4 text-amber-500 shrink-0 mt-0.5"/> <span>Klicke abschließend auf <strong>Speichern</strong></span></div>
-                    </div>
-                    <a href="https://app.fobizz.com/pinboard/public_boards/cbb73434-0114-4ee8-853d-31788b459d34" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-4 py-2 w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors shadow-lg text-sm mb-6">Zum PA-Team Board <ExternalLink className="w-4 h-4" /></a>
-                    {renderBoard("https://app.fobizz.com/pinboard/public_boards/cbb73434-0114-4ee8-853d-31788b459d34?embed=true&token=b0cbca55223b034ebf4f4d6038851b70", "fobizz PA-Team Board")}
-                  </div>
-                </div>
-
-                <div className="flex gap-4 p-4 bg-emerald-900/20 rounded-xl border border-emerald-500/30">
-                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0">6</div>
-                  <div>
-                    <h4 className="font-bold text-emerald-400 mb-1 [text-wrap:balance]">Wir treffen uns zur Besprechung im Plenum</h4>
-                    <p className="text-sm text-slate-300 leading-relaxed [text-wrap:pretty]">Warte hier, bis die Kursleitung die nächste Phase einläutet.</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        );
-      case 4:
-        return (
-          <div className="space-y-6">
-            <div className="bg-slate-800 p-6 rounded-xl border-l-4 border-l-purple-500 shadow-md">
-              <h3 className="font-bold text-lg mb-2 text-white [text-wrap:balance]">Akte 04: Die 4 Säulen der wirksamen Einwilligung (Informed Consent)</h3>
-              <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
-                Damit eine Einwilligung rechtlich bindend ist, müssen vier essenzielle Säulen stehen. Bröckelt eine davon, ist die Maßnahme juristisch eine Körperverletzung.
-              </p>
-            </div>
-            
-            <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-              <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-black flex items-center justify-center shrink-0">1</div>
-              <div className="pt-1 w-full">
-                <p className="text-slate-200 font-bold text-sm mb-2">Rechtliches Fundament: Das 4-Säulen-Modell</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-slate-300">
-                  <div className="bg-slate-800 p-3 rounded-lg border border-slate-700">
-                    <strong className="text-rose-400 font-bold block mb-1">1. Einwilligungsfähigkeit</strong>
-                    <span>Der Patient muss intellektuell fähig sein, Bedeutung und Risiken des Eingriffs zu erfassen. Nicht identisch mit Geschäftsfähigkeit!</span>
-                  </div>
-                  <div className="bg-slate-800 p-3 rounded-lg border border-slate-700">
-                    <strong className="text-amber-400 font-bold block mb-1">2. Rechtzeitige & umfassende Aufklärung</strong>
-                    <span>Vor dem Eingriff, mit ausreichend Bedenkzeit, verständlich, schonend und über realistische Alternativen.</span>
-                  </div>
-                  <div className="bg-slate-800 p-3 rounded-lg border border-slate-700">
-                    <strong className="text-blue-400 font-bold block mb-1">3. Freiwilligkeit</strong>
-                    <span>Echte Selbstbestimmung ohne moralischen Druck, Nötigung oder Täuschung durch Personal oder Familie.</span>
-                  </div>
-                  <div className="bg-slate-800 p-3 rounded-lg border border-slate-700">
-                    <strong className="text-emerald-400 font-bold block mb-1">4. Jederzeitige Widerruflichkeit</strong>
-                    <span>Der Patient kann zu jedem Zeitpunkt formlos 'Nein' sagen, ohne Begründung und ohne Verlust des Behandlungsanspruchs.</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Lehrvideo 2: Patienten RICHTIG aufklären! */}
-            <VideoPlayerBlock 
-              title="Patienten RICHTIG aufklären! – Prof. Dr. med. Helmut Frohnhofen" 
-              subtitle="Rechtsdepesche: Praktische Kommunikation, Vulnerabilität & wirksamer Informed Consent" 
-              youtubeId="dUTMy6FxXuU" 
-              linkUrl="https://youtu.be/dUTMy6FxXuU?si=DPZRasFGxlk4F8RM" 
-            />
-
-            <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800 relative overflow-hidden group">
-              <div className="w-8 h-8 rounded-full bg-purple-500 text-white font-black flex items-center justify-center shrink-0 z-10">2</div>
-              <div className="w-full z-10">
-                <h4 className="font-bold text-white mb-2 [text-wrap:balance]">Die 4 Säulen in der Praxisprüfung</h4>
-                <p className="text-slate-300 text-sm mb-4 leading-relaxed [text-wrap:pretty]">
-                  Fülle die vier Säulen für deine Praxisanleitung und Dokumentation aus:
-                </p>
-                {!isSaved ? (
-                  <div className="space-y-4">
-                    <StyledTextarea 
-                      color="rose" 
-                      label="Säule 1: Einwilligungsfähigkeit" 
-                      description="Versteht der Patient Wesen, Bedeutung und Tragweite der Maßnahme? (Wie überprüfst du das?)" 
-                      value={saeule1} 
-                      onChange={(e: any) => setSaeule1(e.target.value)} 
-                      placeholder="Beobachtung & Prüfung der Einsichts- und Urteilsfähigkeit..." 
-                    />
-                    <StyledTextarea 
-                      color="amber" 
-                      label="Säule 2: Aufklärung" 
-                      description="Wurde der Patient rechtzeitig und umfassend (Diagnose, Verlauf, Risiken, Alternativen) informiert?" 
-                      value={saeule2} 
-                      onChange={(e: any) => setSaeule2(e.target.value)} 
-                      placeholder="Prüfung der Aufklärungskriterien und Bedenkzeit..." 
-                    />
-                    <StyledTextarea 
-                      color="blue" 
-                      label="Säule 3: Freiwilligkeit" 
-                      description="Handelt der Patient ohne Zwang oder Druck von Angehörigen/Personal?" 
-                      value={saeule3} 
-                      onChange={(e: any) => setSaeule3(e.target.value)} 
-                      placeholder="Sicherstellung von Freiwilligkeit und echtem Willen..." 
-                    />
-                    <StyledTextarea 
-                      color="emerald" 
-                      label="Säule 4: Widerruflichkeit" 
-                      description="Weiß der Patient, dass er die Einwilligung jederzeit ohne Nachteile widerrufen kann?" 
-                      value={saeule4} 
-                      onChange={(e: any) => setSaeule4(e.target.value)} 
-                      placeholder="Hinweis auf und Umgang mit einem Widerruf..." 
-                    />
-                    
-                    <div className="flex justify-end">
-                      <button onClick={() => setIsSaved(true)} className="px-6 py-2 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold rounded-lg shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Speichern</button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="bg-slate-950 border border-slate-700 p-4 rounded-xl relative">
-                    <div className="space-y-4 pr-10"> 
-                       <div>
-                          <strong className="text-rose-400 block text-xs uppercase tracking-widest mb-1">Säule 1: Einwilligungsfähigkeit:</strong>
-                          <p className="text-slate-300 text-sm whitespace-pre-wrap leading-relaxed [text-wrap:pretty]">{saeule1 || "Keine Eingabe"}</p>
-                       </div>
-                       <div>
-                          <strong className="text-amber-400 block text-xs uppercase tracking-widest mb-1">Säule 2: Aufklärung:</strong>
-                          <p className="text-slate-300 text-sm whitespace-pre-wrap leading-relaxed [text-wrap:pretty]">{saeule2 || "Keine Eingabe"}</p>
-                       </div>
-                       <div>
-                          <strong className="text-blue-400 block text-xs uppercase tracking-widest mb-1">Säule 3: Freiwilligkeit:</strong>
-                          <p className="text-slate-300 text-sm whitespace-pre-wrap leading-relaxed [text-wrap:pretty]">{saeule3 || "Keine Eingabe"}</p>
-                       </div>
-                       <div>
-                          <strong className="text-emerald-400 block text-xs uppercase tracking-widest mb-1">Säule 4: Widerruflichkeit:</strong>
-                          <p className="text-slate-300 text-sm whitespace-pre-wrap leading-relaxed [text-wrap:pretty]">{saeule4 || "Keine Eingabe"}</p>
-                       </div>
-                    </div>
-                    <div className="mt-4 pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                       <button onClick={() => setIsSaved(false)} className="text-xs text-slate-400 hover:text-slate-300">Erneut bearbeiten</button>
-                       {!hasCopied && (
-                          <button onClick={handleCopyCase4} className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-900 font-black rounded-lg shadow-[0_0_15px_rgba(245,158,11,0.5)] transition-all flex items-center gap-2 animate-pulse uppercase tracking-widest text-sm">
-                            <Copy className="w-5 h-5" /> 4 Säulen jetzt kopieren
-                          </button>
-                       )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {hasCopied && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-top-4">
-                <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-                  <div className="w-8 h-8 rounded-full bg-cyan-500 text-white font-black flex items-center justify-center shrink-0">3</div>
-                  <div className="pt-1 w-full">
-                    <h4 className="font-bold text-white mb-2 [text-wrap:balance]">Abgleich & Musterlösung</h4>
-                    <p className="text-sm text-slate-300 mb-4 leading-relaxed [text-wrap:pretty]">Vergleiche deine Reflexion mit dem juristischen Standard.</p>
-                    {!showSolution ? (
-                      <button onClick={() => setShowSolution(true)} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-bold transition-colors">Musterlösung einblenden</button>
-                    ) : (
-                      <div className="bg-slate-950 border-2 border-emerald-500/50 p-6 rounded-xl animate-in fade-in slide-in-from-top-2">
-                        <h5 className="font-black text-emerald-500 mb-4 uppercase tracking-widest text-sm [text-wrap:balance]">Juristischer Erwartungshorizont: Die 4 Säulen</h5>
-                        <div className="space-y-4">
-                          <div>
-                            <strong className="text-rose-400 block mb-1">Säule 1 (Einwilligungsfähigkeit):</strong>
-                            <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
-                              Der Patient muss in der Lage sein, die Informationen über die konkrete Maßnahme aufzunehmen, zu verstehen, gegeneinander abzuwägen und seinen Willen danach frei zu bestimmen („Teach-Back-Methode“: Lassen Sie den Patienten mit eigenen Worten erklären, worum es geht). Einwilligungsfähigkeit wird vermutet; Zweifel müssen begründet und dokumentiert werden.
-                            </p>
-                          </div>
-                          <div className="h-px bg-slate-800"></div>
-                          <div>
-                            <strong className="text-amber-400 block mb-1">Säule 2 (Umfassende Aufklärung):</strong>
-                            <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
-                              Die Aufklärung muss so rechtzeitig erfolgen, dass der Patient wohlüberlegt entscheiden kann (bei elektiven Eingriffen i.d.R. am Vortag, nicht erst auf dem Weg zum OP). Erforderlich ist die Information über Diagnose, Art, Schwere, Risiken und echte Behandlungsalternativen.
-                            </p>
-                          </div>
-                          <div className="h-px bg-slate-800"></div>
-                          <div>
-                            <strong className="text-blue-400 block mb-1">Säule 3 (Freiwilligkeit):</strong>
-                            <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
-                              Die Zustimmung muss autonom erfolgen. Häufige Fehlerquellen: Nötigung durch Angehörige („Opa, unterschreib jetzt endlich!“) oder suggestive Beeinflussung durch medizinisches Personal („Wenn Sie das nicht unterschreiben, müssen Sie nach Hause“).
-                            </p>
-                          </div>
-                          <div className="h-px bg-slate-800"></div>
-                          <div>
-                            <strong className="text-emerald-400 block mb-1">Säule 4 (Widerruflichkeit):</strong>
-                            <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
-                              Der Patient muss darüber belehrt werden, dass er seine Einwilligung jederzeit formlos (auch durch Kopfschütteln oder Abwehrbewegungen) widerrufen kann (§ 630d Abs. 1 Satz 3 BGB). Ein Widerruf beendet sofort jede Rechtfertigung der Maßnahme!
-                            </p>
-                          </div>
-                        </div>
-                        <button onClick={() => setShowSolution(false)} className="text-slate-400 hover:text-slate-300 text-sm mt-4 font-bold">Ausblenden</button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex gap-4 p-4 bg-emerald-900/20 rounded-xl border border-emerald-500/30">
-                  <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0">4</div>
-                  <div>
-                    <h4 className="font-bold text-emerald-400 mb-1 [text-wrap:balance]">Dokumentiere im PA-Team Board</h4>
-                    <p className="text-sm text-slate-300 mb-3 leading-relaxed [text-wrap:pretty]">Kopiere die 4 Säulen und lege im fobizz PA-Team Board unter der Spalte „Informed Consent“ eine neue Karte an.</p>
-                    <a href="https://app.fobizz.com/pinboard/public_boards/cbb73434-0114-4ee8-853d-31788b459d34" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-colors shadow-lg text-sm mb-4">Zum PA-Team Board <ExternalLink className="w-4 h-4" /></a>
-                    {renderBoard("https://app.fobizz.com/pinboard/public_boards/cbb73434-0114-4ee8-853d-31788b459d34?embed=true&token=b0cbca55223b034ebf4f4d6038851b70", "fobizz PA-Team Board")}
-                  </div>
-                </div>
-
-                {renderDocumentationStep(5, 'Informed Consent')}
-              </div>
-            )}
-          </div>
-        );
-      case 5:
-        return (
-          <div className="space-y-6">
-            <div className="bg-slate-800 p-6 rounded-xl border-l-4 border-l-blue-500 shadow-md">
-              <h3 className="font-bold text-lg mb-2 text-white [text-wrap:balance]">Jura-Check: Patientenzimmer freischalten</h3>
-              <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
-                Bevor du das Büro (Raum 03) betreten darfst, musst du dein juristisches Grundwissen unter Beweis stellen. 
-                Löse die folgenden 4 Aufgaben zur Aufklärung, Delegation, Haftung und Informed Consent.
-              </p>
-            </div>
-            
-            <div className="bg-slate-900/50 p-6 rounded-xl border border-slate-800 relative">
-              {case5QuizStep === 0 && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-                  <h4 className="font-bold text-amber-500 mb-2 uppercase tracking-widest text-sm [text-wrap:balance]">Frage 1: Single Choice (Arztvorbehalt)</h4>
-                  <p className="text-white leading-relaxed [text-wrap:pretty]">Wer darf die Risikoaufklärung für einen operativen Eingriff durchführen?</p>
-                  <div className="space-y-2 mt-4">
-                    <button onClick={() => {
-                      setCase5Mistakes(m => m + 1);
-                      setCase5Feedback({msg: 'Falsch! Die Risikoaufklärung unterliegt dem strikten Arztvorbehalt und darf auch bei Zeitnot niemals delegiert werden.', isError: true});
-                    }} className="w-full text-left p-3 rounded-lg bg-slate-800 hover:bg-rose-900/40 border border-slate-700 text-slate-300 transition-colors">
-                      A) Die examinierte Pflegekraft, wenn der Arzt keine Zeit hat.
-                    </button>
-                    <button onClick={() => {
-                      setCase5Feedback({msg: 'Richtig! Das ist ärztlicher Vorbehalt (§ 630e BGB). Weder examinierte Pflegekräfte noch Auszubildende dürfen diese Aufgabe übernehmen.', isError: false, showNext: true});
-                    }} className="w-full text-left p-3 rounded-lg bg-slate-800 hover:bg-emerald-900/40 border border-slate-700 text-slate-300 transition-colors">
-                      B) Der behandelnde oder ein aufklärender Arzt.
-                    </button>
-                    <button onClick={() => {
-                      setCase5Mistakes(m => m + 1);
-                      setCase5Feedback({msg: 'Falsch! Auch unter Aufsicht darf eine Auszubildende keine ärztliche Eingriffsaufklärung durchführen.', isError: true});
-                    }} className="w-full text-left p-3 rounded-lg bg-slate-800 hover:bg-rose-900/40 border border-slate-700 text-slate-300 transition-colors">
-                      C) Die Auszubildende unter Aufsicht.
-                    </button>
-                  </div>
-                  {case5Feedback && case5QuizStep === 0 && (
-                    <div className={`mt-4 p-4 rounded-lg ${case5Feedback.isError ? 'bg-rose-900/30 text-rose-300 border border-rose-800' : 'bg-emerald-900/30 text-emerald-300 border border-emerald-800'}`}>
-                      {case5Feedback.msg}
-                      {case5Feedback.showNext && (
-                        <button onClick={() => {setJuraCheckScore(s => s + 1); setCase5Feedback(null); setCase5QuizStep(1);}} className="block mt-3 px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg transition-colors">Nächste Frage</button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-              {case5QuizStep === 1 && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-                  <h4 className="font-bold text-amber-500 mb-2 uppercase tracking-widest text-sm [text-wrap:balance]">Frage 2: Multiple Choice (Sicherungsaufklärung)</h4>
-                  <p className="text-white leading-relaxed [text-wrap:pretty]">Welche Aussagen zur "Sicherungsaufklärung" in der Pflege sind korrekt? (Wähle alle passenden aus)</p>
-                  <div className="space-y-2 mt-4">
-                    {[
-                      { id: 'a', label: 'A) Sie umfasst die Aufklärung über pflegerische Risiken (z.B. Sturz, Dekubitus).' },
-                      { id: 'b', label: 'B) Sie bedarf immer einer schriftlichen Einwilligungserklärung.' },
-                      { id: 'c', label: 'C) Sie muss dokumentiert werden, um im Schadensfall beweisen zu können, dass aufgeklärt wurde.' },
-                      { id: 'd', label: 'D) Sie kann vom Arzt an die Reinigungskraft delegiert werden.' }
-                    ].map(opt => (
-                      <label key={opt.id} className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${case5Q2Answers[opt.id] ? 'bg-blue-900/30 border-blue-500' : 'bg-slate-800 border-slate-700 hover:bg-slate-700'}`}>
-                        <input type="checkbox" className="w-5 h-5 accent-blue-500" checked={!!case5Q2Answers[opt.id]} onChange={(e) => setCase5Q2Answers({...case5Q2Answers, [opt.id]: e.target.checked})} />
-                        <span className="text-slate-300">{opt.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                  <button onClick={() => {
-                    if (case5Q2Answers['a'] && !case5Q2Answers['b'] && case5Q2Answers['c'] && !case5Q2Answers['d']) {
-                      setCase5Feedback({msg: 'Richtig! Sicherungsaufklärung betrifft pflegerische Risiken und muss zwingend dokumentiert werden. Eine Schriftform ist nicht ausnahmslos zwingend (mündlich/konkludent reicht oft), aber wer schreibt, der bleibt!', isError: false, showNext: true});
-                    } else {
-                      setCase5Mistakes(m => m + 1);
-                      setCase5Feedback({msg: 'Nicht ganz! Beachte: Eine strenge Schriftform ist bei der Sicherungsaufklärung gesetzlich nicht immer zwingend, aber Doku ist Pflicht (§ 630f BGB). Und an Reinigungskräfte kann man sie gewiss nicht delegieren.', isError: true});
-                    }
-                  }} className="mt-4 px-4 py-2 bg-amber-500 text-slate-900 font-bold rounded-lg hover:bg-amber-400">Überprüfen</button>
-                  {case5Feedback && case5QuizStep === 1 && (
-                    <div className={`mt-4 p-4 rounded-lg ${case5Feedback.isError ? 'bg-rose-900/30 text-rose-300 border border-rose-800' : 'bg-emerald-900/30 text-emerald-300 border border-emerald-800'}`}>
-                      {case5Feedback.msg}
-                      {case5Feedback.showNext && (
-                        <button onClick={() => {setJuraCheckScore(s => s + 1); setCase5Feedback(null); setCase5QuizStep(2);}} className="block mt-3 px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg transition-colors">Nächste Frage</button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-              {case5QuizStep === 2 && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-                  <h4 className="font-bold text-amber-500 mb-2 uppercase tracking-widest text-sm [text-wrap:balance]">Frage 3: Lückentext (Strafrechtliche Einordnung)</h4>
-                  <p className="text-white leading-relaxed [text-wrap:pretty]">Wie lautet der juristische Fachbegriff für jede medizinische/pflegerische Maßnahme (z.B. Blutabnahme, Waschen), die *ohne* wirksame Einwilligung des Patienten durchgeführt wird?</p>
-                  <div className="mt-4">
-                    <StyledTextarea 
-                      label="Dein Lösungswort" 
-                      value={case5Q3Text} 
-                      onChange={(e: any) => setCase5Q3Text(e.target.value)} 
-                      placeholder="Begriff eingeben (z. B. Körperverletzung)..."
-                    />
-                  </div>
-                  <button onClick={() => {
-                    const ans = case5Q3Text.toLowerCase().trim();
-                    if (ans === 'körperverletzung' || ans === 'koerperverletzung' || ans.includes('körperverletzung') || ans.includes('koerperverletzung')) {
-                      setCase5Feedback({msg: 'Exzellent! Nach ständiger BGH-Rechtsprechung erfüllt jeder Heileingriff und jede pflegerische Maßnahme ohne wirksame Einwilligung den Tatbestand der Körperverletzung (§ 223 StGB). Die Einwilligung ist der rechtfertigende Grund.', isError: false, showNext: true});
-                    } else {
-                      setCase5Mistakes(m => m + 1);
-                      setCase5Feedback({msg: 'Falsch. Gesucht ist das Delikt aus dem Strafgesetzbuch (§ 223 StGB). Ein Eingriff in die körperliche Unversehrtheit ohne Einwilligung ist eine ...', isError: true});
-                    }
-                  }} className="mt-4 px-4 py-2 bg-amber-500 text-slate-900 font-bold rounded-lg hover:bg-amber-400">Überprüfen</button>
-                  {case5Feedback && case5QuizStep === 2 && (
-                    <div className={`mt-4 p-4 rounded-lg ${case5Feedback.isError ? 'bg-rose-900/30 text-rose-300 border border-rose-800' : 'bg-emerald-900/30 text-emerald-300 border border-emerald-800'}`}>
-                      {case5Feedback.msg}
-                      {case5Feedback.showNext && (
-                        <button onClick={() => {setJuraCheckScore(s => s + 1); setCase5Feedback(null); setCase5QuizStep(3);}} className="block mt-3 px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg transition-colors">Nächste Frage</button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-              {case5QuizStep === 3 && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-                  <h4 className="font-bold text-amber-500 mb-2 uppercase tracking-widest text-sm [text-wrap:balance]">Frage 4: Richtig oder Falsch (Einwilligungsfähigkeit)</h4>
-                  <p className="text-white leading-relaxed [text-wrap:pretty]">Einwilligungsfähigkeit ist identisch mit der rechtlichen Geschäftsfähigkeit.</p>
-                  <div className="flex gap-4 mt-4">
-                    <button onClick={() => {
-                      setCase5Mistakes(m => m + 1);
-                      setCase5Feedback({msg: 'Falsch! Einwilligungsfähigkeit hängt von der Einsichtsfähigkeit in die spezifische Maßnahme ab, nicht vom Alter oder der Geschäftsfähigkeit. Auch Minderjährige können einwilligungsfähig sein, während voll geschäftsfähige Personen bei akuter Verwirrtheit vorübergehend einwilligungsunfähig sein können.', isError: true});
-                    }} className="flex-1 p-3 rounded-lg bg-slate-800 hover:bg-rose-900/40 border border-slate-700 text-slate-300 font-bold transition-colors">Richtig</button>
-                    <button onClick={() => {
-                      setCase5Feedback({msg: 'Richtig! Sehr gut aufgepasst. Die Einwilligungsfähigkeit ist eine Frage der natürlichen Einsichts- und Urteilsfähigkeit im konkreten Einzelfall – unabhängig von Geschäftsfähigkeit oder Volljährigkeit.', isError: false, showNext: true});
-                    }} className="flex-1 p-3 rounded-lg bg-slate-800 hover:bg-emerald-900/40 border border-slate-700 text-slate-300 font-bold transition-colors">Falsch</button>
-                  </div>
-                  {case5Feedback && case5QuizStep === 3 && (
-                    <div className={`mt-4 p-4 rounded-lg ${case5Feedback.isError ? 'bg-rose-900/30 text-rose-300 border border-rose-800' : 'bg-emerald-900/30 text-emerald-300 border border-emerald-800'}`}>
-                      {case5Feedback.msg}
-                      {case5Feedback.showNext && (
-                        <button onClick={() => {setJuraCheckScore(s => s + 1); setCase5Feedback(null); setCase5QuizStep(4);}} className="block mt-3 px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg transition-colors">Ergebnis ansehen</button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-              {case5QuizStep === 4 && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 text-center py-8">
-                  <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle2 className="w-8 h-8 text-emerald-500" />
-                  </div>
-                  <h4 className="font-black text-emerald-500 mb-2 uppercase tracking-widest text-lg [text-wrap:balance]">Jura-Check bestanden!</h4>
-                  <p className="text-slate-300 mb-2 leading-relaxed [text-wrap:pretty]">Du hast alle Rechtsfragen gemeistert. Die Grenzen der Delegation und die Bedingungen einer wirksamen Einwilligung sind dir glasklar.</p>
-                  {case5Mistakes === 0 && (
-                    <p className="text-amber-400 font-bold text-sm bg-amber-500/10 p-2 rounded-lg border border-amber-500/30 mb-4 inline-block">
-                      ★ Abzeichen erhalten: Jura-Ass (Akte 05) – Fehlerfrei im ersten Durchlauf!
-                    </p>
-                  )}
-                  <div>
-                    <p className="text-amber-500 font-bold bg-amber-500/10 inline-block px-4 py-2 rounded-lg border border-amber-500/30">
-                      <LockIcon className="w-4 h-4 inline mr-2" /> Raum 03 (Büro) ist nun für dich freigeschaltet!
-                    </p>
-                  </div>
-                  <div className="mt-8">
-                    <button onClick={() => {setCase5QuizStep(0); setJuraCheckScore(0); setCase5Mistakes(0); setCase5Q2Answers({}); setCase5Q3Text(''); setCase5Feedback(null);}} className="text-slate-400 hover:text-slate-300 text-sm">Quiz wiederholen</button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      case 6:
-        return (
-          <div className="space-y-6">
-            <div className="bg-slate-800 p-6 rounded-xl border-l-4 border-l-emerald-500 shadow-md">
-              <h3 className="font-bold text-lg mb-2 text-white [text-wrap:balance]">Akte 06: Der Stufenprozess der mutmaßlichen Einwilligung (Eskalationsmodell)</h3>
-              <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
-                Was tun wir, wenn Patient:innen nicht einwilligungsfähig sind (z.B. bei schwerer Demenz, Koma oder im Akut-Notfall)? Dieser 6-stufige Prozess sichert dich ab.
-              </p>
-            </div>
-
-            <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-              <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-black flex items-center justify-center shrink-0">1</div>
-              <div className="pt-1 w-full">
-                <p className="text-slate-200 font-bold text-sm mb-3">Die 6 Stufen des rechtlichen Eskalationsmodells</p>
-                <div className="space-y-2 text-xs text-slate-300">
-                  <div className="bg-slate-800/80 p-3 rounded-lg border border-slate-700 flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-rose-600 text-white font-bold flex items-center justify-center shrink-0">1</span>
-                    <div>
-                      <strong className="text-rose-400 block text-sm">Stufe 1: Notfallindikation</strong>
-                      <span>Besteht akute Lebensgefahr oder schwere Gesundheitsgefahr? Wenn ja: Sofortiges lebenserhaltendes Handeln nach mutmaßlichem Willen, keine Verzögerung durch Betreuerbestellung!</span>
-                    </div>
-                  </div>
-                  <div className="bg-slate-800/80 p-3 rounded-lg border border-slate-700 flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-amber-600 text-white font-bold flex items-center justify-center shrink-0">2</span>
-                    <div>
-                      <strong className="text-amber-400 block text-sm">Stufe 2: Patientenverfügung (§ 1827 Abs. 1 BGB)</strong>
-                      <span>Gibt es eine schriftliche, gültige und auf die konkrete Lebens- und Behandlungssituation zutreffende Verfügung? Wenn ja: Unmittelbar verbindlich – egal wie alt!</span>
-                    </div>
-                  </div>
-                  <div className="bg-slate-800/80 p-3 rounded-lg border border-slate-700 flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center shrink-0">3</span>
-                    <div>
-                      <strong className="text-blue-400 block text-sm">Stufe 3: Vorsorgevollmacht / Gesetzlicher Betreuer</strong>
-                      <span>Liegt keine spezifische Verfügung vor: Wer ist rechtlich zur Vertretung befugt (Aufgabenkreis Gesundheitsfürsorge)? Angehörige dürfen dies ohne Vollmacht/Ehegattennotvertretung nicht automatisch!</span>
-                    </div>
-                  </div>
-                  <div className="bg-slate-800/80 p-3 rounded-lg border border-slate-700 flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-purple-600 text-white font-bold flex items-center justify-center shrink-0">4</span>
-                    <div>
-                      <strong className="text-purple-400 block text-sm">Stufe 4: Früherer mündlicher Wille</strong>
-                      <span>Was hat der Patient vor Eintritt der Einwilligungsunfähigkeit mündlich oder schriftlich geäußert (Behandlungswünsche, Wertvorstellungen, religiöse Überzeugungen)?</span>
-                    </div>
-                  </div>
-                  <div className="bg-slate-800/80 p-3 rounded-lg border border-slate-700 flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-teal-600 text-white font-bold flex items-center justify-center shrink-0">5</span>
-                    <div>
-                      <strong className="text-teal-400 block text-sm">Stufe 5: Mutmaßlicher Wille</strong>
-                      <span>Was würde der Patient in dieser Situation vernünftigerweise wollen, ausgehend von seiner bisherigen Lebensführung und seinen Wertmaßstäben? (Individuell, nicht gesellschaftlicher Durchschnitt!).</span>
-                    </div>
-                  </div>
-                  <div className="bg-slate-800/80 p-3 rounded-lg border border-slate-700 flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center shrink-0">6</span>
-                    <div>
-                      <strong className="text-emerald-400 block text-sm">Stufe 6: Handlungsentschluss & Lückenlose Dokumentation</strong>
-                      <span>Gemeinsame Entscheidung von Arzt und Vertreter/Pflege, präzise Begründung in der Patientenakte und Durchführung der Maßnahme.</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-              <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-900 font-black flex items-center justify-center shrink-0 z-10">2</div>
-              <div className="w-full z-10">
-                <p className="text-slate-200 font-bold text-sm mb-4">Fallvignette im Pflegealltag: Frau Wagner (Zustand nach Apoplex)</p>
-                <div className="bg-slate-800 p-5 rounded-xl border-l-4 border-l-blue-500 shadow-md">
-                  <p className="text-slate-300 text-sm leading-relaxed mb-4 [text-wrap:pretty]">
-                    Bewohnerin Frau Wagner (82 Jahre, schwere Aphasie und Verwirrtheit nach Re-Insult, nicht ansprechbar für Aufklärungsgespräche) benötigt eine PEG-Sonde zur Ernährung. 
-                    Ihre Tochter verlangt energisch: <em>„Legen Sie sofort die Magensonde, meine Mutter verhungert sonst!“</em>. Der Sohn hingegen widerspricht vehement: <em>„Mutter wollte niemals künstlich ernährt an Schläuchen hängen, das hat sie uns immer gesagt!“</em>
-                  </p>
-                  <p className="text-slate-300 text-sm leading-relaxed mb-4 [text-wrap:pretty]">
-                    <strong className="text-amber-400">Das ethisch-juristische Dilemma:</strong> Es liegt kein akuter Erstickungsnotfall vor, aber eine langfristige Behandlungsentscheidung. Deine Auszubildende Sarah ist verunsichert: Auf wen müssen wir hören? Auf den Arzt? Auf die Tochter? Oder auf den Sohn?
-                  </p>
-                  <p className="text-slate-300 text-sm leading-relaxed bg-slate-900 p-3 rounded-lg border border-slate-700 [text-wrap:pretty]">
-                    <strong className="text-emerald-400">Deine Anleitung:</strong> Gehe mit Sarah Schritt für Schritt das 6-Stufen-Eskalationsmodell durch, um eine rechtssichere Entscheidung herbeizuführen.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-              <div className="w-8 h-8 rounded-full bg-emerald-500 text-slate-900 font-black flex items-center justify-center shrink-0 z-10">3</div>
-              <div className="w-full z-10">
-                <h4 className="font-bold text-white mb-2 [text-wrap:balance]">Der Arbeitsauftrag (Das Azubi-Board)</h4>
-                <p className="text-sm text-slate-300 mb-4 leading-relaxed [text-wrap:pretty]">
-                  Stelle die 6 Prüfschritte auf dem fobizz Azubi-Board für Sarah zusammen, damit sie im Dienst strukturiert vorgehen kann.
-                </p>
-                <div className="bg-slate-800 p-4 rounded-lg border border-slate-700 mb-4">
-                  <strong className="text-white block mb-2">Checkliste zur mutmaßlichen Einwilligung bei Frau Wagner:</strong>
-                  <ol className="list-decimal pl-5 text-sm text-slate-300 space-y-1">
-                    <li>1. Notfallindikation prüfen (Akute Lebensgefahr? Nein, elektive PEG-Anlage).</li>
-                    <li>2. Existiert eine schriftliche Patientenverfügung in der Akte?</li>
-                    <li>3. Gibt es eine Vorsorgevollmacht oder gerichtliche Betreuung mit Aufgabenkreis Gesundheit?</li>
-                    <li>4. Welcher frühere Wille wurde gegenüber Angehörigen geäußert?</li>
-                    <li>5. Was entspricht Frau Wagners mutmaßlichem Willen?</li>
-                    <li>6. Dokumentation des Ethik-Konsils und ärztlich-pflegerischen Handlungsentschlusses.</li>
-                  </ol>
-                </div>
-                {renderBoard("https://app.fobizz.com/pinboard/public_boards/b28a4a86-0543-419d-8d4e-df64affde584?embed=true&token=e57c9cbe6f87eb5d8ee67f6eeacd3cb8", "fobizz Azubi-Board")}
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-              <div className="w-8 h-8 rounded-full bg-purple-500 text-white font-black flex items-center justify-center shrink-0">4</div>
-              <div className="pt-1 w-full">
-                <h4 className="font-bold text-white mb-2 [text-wrap:balance]">Juristische Musterlösung</h4>
-                <p className="text-sm text-slate-300 mb-4 leading-relaxed [text-wrap:pretty]">Abgleich für das Vorgehen bei Frau Wagner.</p>
-                {!showSolution ? (
-                  <button onClick={() => setShowSolution(true)} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-bold transition-colors">
-                    Musterlösung anzeigen
-                  </button>
-                ) : (
-                  <div className="bg-slate-950 border-2 border-emerald-500/50 p-6 rounded-xl animate-in fade-in slide-in-from-top-2">
-                    <h5 className="font-black text-emerald-500 mb-4 uppercase tracking-widest text-sm [text-wrap:balance]">Lösungsalgorithmus bei uneinigen Angehörigen</h5>
-                    <div className="space-y-4 text-sm text-slate-300 leading-relaxed">
-                      <p>
-                        <strong>1. Notfall?</strong> Nein, keine vitale Notfallindikation im Minutentakt. Ein Übergehen des Willens aus Eile ist unzulässig.
-                      </p>
-                      <p>
-                        <strong>2. Patientenverfügung prüfen:</strong> Enthält die Akte eine PV, die den Verzicht auf künstliche Ernährung bei irreversiblem Hirnschaden festlegt? Wenn ja, ist diese für Arzt, Betreuer und Angehörige zwingend bindend (§ 1827 Abs. 1 BGB).
-                      </p>
-                      <p>
-                        <strong>3. Vertretung klären:</strong> Haben Tochter oder Sohn eine Vorsorgevollmacht? Wenn keine Vollmacht vorliegt und sich die Geschwister widersprechen, muss beim Betreuungsgericht unverzüglich die Bestellung eines neutralen Berufsbetreuers angeregt werden.
-                      </p>
-                      <p>
-                        <strong>4. Mündliche Äußerungen & mutmaßlicher Wille:</strong> Der Betreuer muss gemeinsam mit dem behandelnden Arzt ermitteln, was Frau Wagner selbst gewollt hätte. Bei anhaltendem Dissens über lebensverlängernde Maßnahmen ist eine Genehmigung des Betreuungsgerichts erforderlich (§ 1829 BGB).
-                      </p>
-                      <p className="text-emerald-400 font-bold pt-2 border-t border-slate-800">
-                        Fazit für die Pflege: Neutral bleiben, keine Parteinahme für Tochter oder Sohn, lückenlose Dokumentation der Aussagen und unverzügliche Information des Arztes und der Stationsleitung!
-                      </p>
-                    </div>
-                    <button onClick={() => setShowSolution(false)} className="text-slate-400 hover:text-slate-300 text-sm mt-4 font-bold">Ausblenden</button>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            {renderDocumentationStep(5, 'Sarah')}
-          </div>
-        );
-
-      case 7:
-        return (
-          <div className="space-y-6">
-            <div className="bg-slate-800 p-6 rounded-xl border-l-4 border-l-blue-500 shadow-md">
-              <h3 className="font-bold text-lg mb-2 text-white [text-wrap:balance]">Wissenstest: Eskalationsmodell bei Einwilligungsunfähigkeit</h3>
-              <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
-                Um den Stufenprozess der mutmaßlichen Einwilligung in Notfällen und Grenzsituationen sicher anwenden zu können, überprüfe hier dein theoretisches Rechts- und Ethikwissen.
-              </p>
-            </div>
-            
-            <div className="bg-slate-900/50 p-6 rounded-xl border border-slate-800">
-              {case7QuizStep === 0 && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-                  <h4 className="font-bold text-amber-500 mb-2 uppercase tracking-widest text-sm [text-wrap:balance]">Frage 1: Single Choice (Notfallkompetenz)</h4>
-                  <p className="text-white leading-relaxed [text-wrap:pretty]">Ein bewusstloser Patient (ohne Angehörige/Verfügung) blutet stark. Was tust du?</p>
-                  <div className="space-y-2 mt-4">
-                    <button onClick={() => {
-                      setCase7Mistakes(m => m + 1);
-                      setCase7Feedback({msg: 'Falsch! Im akuten Notfall darf eine lebenserhaltende Maßnahme keinesfalls verzögert werden, um auf das Gericht oder Betreuer zu warten.', isError: true});
-                    }} className="w-full text-left p-3 rounded-lg bg-slate-800 hover:bg-rose-900/40 border border-slate-700 text-slate-300 transition-colors">
-                      A) Ich warte, bis ein gesetzlicher Betreuer bestellt wurde.
-                    </button>
-                    <button onClick={() => {
-                      setCase7Feedback({msg: 'Richtig! Bei akuter Lebensgefahr greift die Notfallindikation und der mutmaßliche Wille zur Lebenserhaltung. Es muss unverzüglich gehandelt werden (§ 630d Abs. 1 Satz 4 BGB).', isError: false, showNext: true});
-                    }} className="w-full text-left p-3 rounded-lg bg-slate-800 hover:bg-emerald-900/40 border border-slate-700 text-slate-300 transition-colors">
-                      B) Ich handele sofort aufgrund der Notfallkompetenz und des mutmaßlichen Willens (Lebenserhaltung).
-                    </button>
-                    <button onClick={() => {
-                      setCase7Mistakes(m => m + 1);
-                      setCase7Feedback({msg: 'Falsch! Die Polizei ist keine medizinische Instanz und kann keine Einwilligung erteilen.', isError: true});
-                    }} className="w-full text-left p-3 rounded-lg bg-slate-800 hover:bg-rose-900/40 border border-slate-700 text-slate-300 transition-colors">
-                      C) Ich rufe die Polizei.
-                    </button>
-                  </div>
-                  {case7Feedback && case7QuizStep === 0 && (
-                    <div className={`mt-4 p-4 rounded-lg ${case7Feedback.isError ? 'bg-rose-900/30 text-rose-300 border border-rose-800' : 'bg-emerald-900/30 text-emerald-300 border border-emerald-800'}`}>
-                      {case7Feedback.msg}
-                      {case7Feedback.showNext && (
-                        <button onClick={() => {setCase7Score(s => s + 1); setCase7Feedback(null); setCase7QuizStep(1);}} className="block mt-3 px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg transition-colors">Nächste Frage</button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-              {case7QuizStep === 1 && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-                  <h4 className="font-bold text-amber-500 mb-2 uppercase tracking-widest text-sm [text-wrap:balance]">Frage 2: Multiple Choice (Patientenautonomie vs. Betreuer)</h4>
-                  <p className="text-white leading-relaxed [text-wrap:pretty]">Eine gesetzliche Betreuerin (Aufgabenkreis: Gesundheitsfürsorge) entscheidet *gegen* den klar formulierten Willen eines aktuell einwilligungsfähigen Patienten. Was stimmt? (Wähle alle passenden aus)</p>
-                  <div className="space-y-2 mt-4">
-                    {[
-                      { id: 'a', label: 'A) Der Wille des einwilligungsfähigen Patienten hat immer Vorrang.' },
-                      { id: 'b', label: 'B) Die Betreuerin hat das letzte Wort, da sie gerichtlich bestellt ist.' },
-                      { id: 'c', label: 'C) Die Pflegekraft muss sich dem Patientenwillen beugen und dies dokumentieren.' },
-                      { id: 'd', label: 'D) Der Arzt muss den Betreuer ignorieren.' }
-                    ].map(opt => (
-                      <label key={opt.id} className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${case7Q2Answers[opt.id] ? 'bg-blue-900/30 border-blue-500' : 'bg-slate-800 border-slate-700 hover:bg-slate-700'}`}>
-                        <input type="checkbox" className="w-5 h-5 accent-blue-500" checked={!!case7Q2Answers[opt.id]} onChange={(e) => setCase7Q2Answers({...case7Q2Answers, [opt.id]: e.target.checked})} />
-                        <span className="text-slate-300">{opt.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                  <button onClick={() => {
-                    if (case7Q2Answers['a'] && !case7Q2Answers['b'] && case7Q2Answers['c'] && case7Q2Answers['d']) {
-                      setCase7Feedback({msg: 'Hervorragend! Ist der Patient einwilligungsfähig, entscheidet allein ER (§ 630d BGB). Ein Betreuer hat in diesem Moment keinerlei Vertretungsmacht. Arzt und Pflege müssen sich dem Patientenwillen beugen.', isError: false, showNext: true});
-                    } else {
-                      setCase7Mistakes(m => m + 1);
-                      setCase7Feedback({msg: 'Nicht ganz richtig! Wichtiges juristisches Prinzip: Eine Betreuung ersetzt niemals den Willen eines Patienten, solange dieser einsichts- und urteilsfähig ist. Betreuer haben kein Bestimmungsrecht über einwilligungsfähige Personen! (Tipp: 3 Aussagen sind zutreffend)', isError: true});
-                    }
-                  }} className="mt-4 px-4 py-2 bg-amber-500 text-slate-900 font-bold rounded-lg hover:bg-amber-400">Überprüfen</button>
-                  {case7Feedback && case7QuizStep === 1 && (
-                    <div className={`mt-4 p-4 rounded-lg ${case7Feedback.isError ? 'bg-rose-900/30 text-rose-300 border border-rose-800' : 'bg-emerald-900/30 text-emerald-300 border border-emerald-800'}`}>
-                      {case7Feedback.msg}
-                      {case7Feedback.showNext && (
-                        <button onClick={() => {setCase7Score(s => s + 1); setCase7Feedback(null); setCase7QuizStep(2);}} className="block mt-3 px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg transition-colors">Nächste Frage</button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-              {case7QuizStep === 2 && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-                  <h4 className="font-bold text-amber-500 mb-2 uppercase tracking-widest text-sm [text-wrap:balance]">Frage 3: Richtig oder Falsch (Formvorschrift Patientenverfügung)</h4>
-                  <p className="text-white leading-relaxed [text-wrap:pretty]">Eine Patientenverfügung ist nur dann bindend, wenn sie notariell beglaubigt wurde.</p>
-                  <div className="flex gap-4 mt-4">
-                    <button onClick={() => {
-                      setCase7Mistakes(m => m + 1);
-                      setCase7Feedback({msg: 'Falsch! Eine notarielle Beglaubigung ist rechtlich NICHT erforderlich. Schriftform (eigenhändige Unterschrift) reicht gemäß § 1827 Abs. 1 BGB vollkommen aus.', isError: true});
-                    }} className="flex-1 p-3 rounded-lg bg-slate-800 hover:bg-rose-900/40 border border-slate-700 text-slate-300 font-bold transition-colors">Richtig</button>
-                    <button onClick={() => {
-                      setCase7Feedback({msg: 'Richtig! Gesetzlich reicht die einfache Schriftform mit eigenhändiger Unterschrift (§ 1827 BGB). Ein Notar ist nicht zwingend vorgeschrieben.', isError: false, showNext: true});
-                    }} className="flex-1 p-3 rounded-lg bg-slate-800 hover:bg-emerald-900/40 border border-slate-700 text-slate-300 font-bold transition-colors">Falsch</button>
-                  </div>
-                  {case7Feedback && case7QuizStep === 2 && (
-                    <div className={`mt-4 p-4 rounded-lg ${case7Feedback.isError ? 'bg-rose-900/30 text-rose-300 border border-rose-800' : 'bg-emerald-900/30 text-emerald-300 border border-emerald-800'}`}>
-                      {case7Feedback.msg}
-                      {case7Feedback.showNext && (
-                        <button onClick={() => {setCase7Score(s => s + 1); setCase7Feedback(null); setCase7QuizStep(3);}} className="block mt-3 px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg transition-colors">Nächste Frage</button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-              {case7QuizStep === 3 && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-                  <h4 className="font-bold text-amber-500 mb-2 uppercase tracking-widest text-sm [text-wrap:balance]">Frage 4: Dropdown / Reihenfolge</h4>
-                  <p className="text-white mb-4 leading-relaxed [text-wrap:pretty]">Ordne die Schritte der Willensermittlung bei einer nicht ansprechbaren, nicht notfallmäßigen Patientin in die korrekte Reihenfolge:</p>
-                  <div className="space-y-3">
-                    {[1, 2, 3, 4].map((stepNum) => (
-                      <div key={stepNum} className="flex items-center gap-4 bg-slate-800 p-3 rounded-lg border border-slate-700">
-                        <span className="w-8 h-8 rounded-full bg-slate-700 text-amber-400 font-bold flex items-center justify-center shrink-0">
-                          {stepNum}
-                        </span>
-                        <select 
-                          value={case7Q4Slots[stepNum] || ''} 
-                          onChange={(e) => setCase7Q4Slots({...case7Q4Slots, [stepNum]: e.target.value})} 
-                          className="w-full bg-slate-900 text-white border border-slate-600 rounded p-2 outline-none focus:border-amber-500 text-sm"
-                        >
-                          <option value="">-- Wähle den Schritt --</option>
-                          <option value="Prüfen auf Patientenverfügung">1. Prüfen auf Patientenverfügung</option>
-                          <option value="Gesetzlichen Betreuer / Bevollmächtigten kontaktieren">2. Gesetzlichen Betreuer / Bevollmächtigten kontaktieren</option>
-                          <option value="Bisherige mündliche Äußerungen evaluieren">3. Bisherige mündliche Äußerungen evaluieren</option>
-                          <option value="Mutmaßlichen Willen (ethisch) ableiten">4. Mutmaßlichen Willen (ethisch) ableiten</option>
-                        </select>
-                      </div>
-                    ))}
-                  </div>
-                  <button onClick={() => {
-                    if (
-                      case7Q4Slots[1] === 'Prüfen auf Patientenverfügung' &&
-                      case7Q4Slots[2] === 'Gesetzlichen Betreuer / Bevollmächtigten kontaktieren' &&
-                      case7Q4Slots[3] === 'Bisherige mündliche Äußerungen evaluieren' &&
-                      case7Q4Slots[4] === 'Mutmaßlichen Willen (ethisch) ableiten'
-                    ) {
-                      setCase7Feedback({msg: 'Perfekt! Du hast die Willensermittlung exakt nach dem juristischen Stufenmodell geordnet.', isError: false, showNext: true});
-                    } else {
-                      setCase7Mistakes(m => m + 1);
-                      setCase7Feedback({msg: 'Leider noch nicht ganz korrekt. Das Stufenmodell verlangt: 1. Schriftliche Patientenverfügung -> 2. Bevollmächtigter/Betreuer -> 3. Mündliche Äußerungen -> 4. Mutmaßlicher Wille.', isError: true});
-                    }
-                  }} className="mt-4 px-4 py-2 bg-amber-500 text-slate-900 font-bold rounded-lg hover:bg-amber-400">Überprüfen</button>
-                  {case7Feedback && case7QuizStep === 3 && (
-                    <div className={`mt-4 p-4 rounded-lg ${case7Feedback.isError ? 'bg-rose-900/30 text-rose-300 border border-rose-800' : 'bg-emerald-900/30 text-emerald-300 border border-emerald-800'}`}>
-                      {case7Feedback.msg}
-                      {case7Feedback.showNext && (
-                        <button onClick={() => {setCase7Score(s => s + 1); setCase7Feedback(null); setCase7QuizStep(4);}} className="block mt-3 px-4 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-lg transition-colors">Ergebnis ansehen</button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-              {case7QuizStep === 4 && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 text-center py-8">
-                  <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle2 className="w-8 h-8 text-emerald-500" />
-                  </div>
-                  <h4 className="font-black text-emerald-500 mb-2 uppercase tracking-widest text-lg [text-wrap:balance]">Eskalationsmodell gemeistert!</h4>
-                  <p className="text-slate-300 mb-2 leading-relaxed [text-wrap:pretty]">Ausgezeichnet. Du kannst den Stufenprozess der mutmaßlichen Einwilligung bei unklaren Zuständen sicher navigieren und die Patientenautonomie schützen.</p>
-                  {case7Mistakes === 0 && (
-                    <p className="text-amber-400 font-bold text-sm bg-amber-500/10 p-2 rounded-lg border border-amber-500/30 mb-4 inline-block">
-                      ★ Abzeichen erhalten: Ethik-Experte (Akte 07) – Fehlerfrei gelöst!
-                    </p>
-                  )}
-                  <div>
-                    <p className="text-amber-500 font-bold bg-amber-500/10 inline-block px-4 py-2 rounded-lg border border-amber-500/30">
-                      <LockIcon className="w-4 h-4 inline mr-2" /> Raum 04 (PD Büro) ist nun für dich freigeschaltet!
-                    </p>
-                  </div>
-                  <div className="mt-8">
-                    <button onClick={() => {setCase7QuizStep(0); setCase7Score(0); setCase7Mistakes(0); setCase7Q2Answers({}); setCase7Q4Slots({}); setCase7Feedback(null);}} className="text-slate-400 hover:text-slate-300 text-sm">Quiz wiederholen</button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        );
-case 8:
-        return (
-          <div className="space-y-6">
-            <div className="bg-slate-800 p-6 rounded-xl border-l-4 border-l-amber-500 shadow-md">
-              <h3 className="font-bold text-lg mb-2 text-white [text-wrap:balance]">Die Königsdisziplin: Grauzone Aufklärung & Einwilligung</h3>
-              <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
-                In dieser finalen Akte führen wir alles zusammen: Deine juristische Fachkompetenz, deine ethische Haltung und die pädagogische Schutzfunktion für deine Auszubildende.
-              </p>
-              <div className="mt-4 p-4 bg-slate-900/80 rounded-lg border border-amber-500/30 text-amber-100 text-sm leading-relaxed">
-                <p className="font-bold text-amber-400 mb-1">🚨 Der Praxisfall: Frau Meinhardt und Herr Müller</p>
-                <p className="italic">
-                  „Frau Meinhardt (Auszubildende) kommt aufgeregt zu dir: ‚Herr Müller (78, leicht dementiell verändert, aber situativ orientiert) soll morgen zur Koloskopie. Der Stationsarzt hat kurz reingeschaut, ihm den Aufklärungsbogen hingelegt und gesagt: Unterschreiben Sie hier mal eben, ich hab gleich OP. Herr Müller hat Angst, versteht die Risiken gar nicht und weint. Jetzt bittet mich die Pflegeleitung, ihm die Sedierungsrisiken zu erklären und schnell die Unterschrift einzuholen, damit die Vorbereitung starten kann.‘“
-                </p>
-                <p className="mt-2 font-medium text-white">
-                  Wie handelst du als Praxisanleitung? Was lehrst du Frau Meinhardt über die rechtlichen Grenzen, die Pflichten des Arztes und den Patientenschutz?
-                </p>
-              </div>
-            </div>
-
-            {/* Schritt 1: Rechtsanalyse */}
-            <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-              <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-black flex items-center justify-center shrink-0 z-10">1</div>
-              <div className="w-full z-10">
-                <p className="text-slate-200 font-bold text-sm mb-2">Schritt 1: Juristische & Ethische Ersteinschätzung</p>
-                <p className="text-slate-300 text-sm mb-4 leading-relaxed [text-wrap:pretty]">
-                  Analysiere die Situation juristisch: Welche <strong>3 gravierenden Rechtsbrüche bzw. Risiken</strong> drohen hier akut? (Hinweis: Denke an den Arztvorbehalt bei Eingriffsaufklärung § 630e BGB, mangelnde Freiwilligkeit / unzureichende Aufklärung sowie die fragliche Einwilligungsfähigkeit).
-                </p>
-                <StyledTextarea
-                  label="Deine Analyse der Rechtsbrüche & Risiken"
-                  description="Welche juristischen Grenzen werden hier von Stationsarzt und Pflegeleitung überschritten?"
-                  value={case8Einschaetzung}
-                  onChange={(e: any) => setCase8Einschaetzung(e.target.value)}
-                  placeholder="1. Verstoß gegen Arztvorbehalt (§ 630e BGB): Pflege darf keine Risikoaufklärung für invasive Eingriffe/Sedierung durchführen...&#10;2. Keine informierte und freiwillige Einwilligung (Druck, Patient weint und versteht Risiken nicht)...&#10;3. Einwilligungsfähigkeit muss vorab geprüft werden (situative Orientierung validieren)..."
-                />
-              </div>
-            </div>
-
-            {/* Schritt 2: Sofortige Handlung */}
-            <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-              <div className="w-8 h-8 rounded-full bg-amber-500 text-slate-900 font-black flex items-center justify-center shrink-0 z-10">2</div>
-              <div className="w-full z-10">
-                <p className="text-slate-200 font-bold text-sm mb-2">Schritt 2: Sofortige Intervention & Schutzfunktion</p>
-                <p className="text-slate-300 text-sm mb-4 leading-relaxed [text-wrap:pretty]">
-                  Wie intervenierst du unmittelbar? Wie schützt du Herrn Müller vor einer unaufgeklärten Maßnahme und wie stellst du dich schützend vor deine Auszubildende gegenüber der Stations-/Pflegeleitung?
-                </p>
-                <StyledTextarea
-                  label="Deine Sofortmaßnahmen & Pädagogische Intervention"
-                  description="Konkrete Schritte: Stoppen der Vorbereitung, Beruhigung von Herrn Müller, Remonstration / Gespräch mit Pflegeleitung & Arzt."
-                  value={case8Handlung}
-                  onChange={(e: any) => setCase8Handlung(e.target.value)}
-                  placeholder="1. Patientenschutz: Frau Meinhardt sofort anweisen, keine Aufklärung durchzuführen und keine Unterschrift einzuholen. Zu Herrn Müller gehen, ihn beruhigen und versichern, dass nichts gegen seinen Willen geschieht.&#10;2. Remonstration & Leitung: Sachliches Gespräch mit der Pflegeleitung suchen, auf Arztvorbehalt hinweisen und die rechtswidrige Delegation ablehnen.&#10;3. Ärztliche Nachforderung: Den Arzt auffordern, die ordnungsgemäße Aufklärung persönlich durchzuführen oder den Eingriff zu verschieben..."
-                />
-              </div>
-            </div>
-
-            {/* Schritt 3: KI Sparringspartner */}
-            <div className="flex items-start gap-4 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
-              <div className="w-8 h-8 rounded-full bg-purple-500 text-white font-black flex items-center justify-center shrink-0 z-10">3</div>
-              <div className="w-full z-10">
-                <h4 className="font-bold text-white mb-2 [text-wrap:balance]">Schritt 3: KI-Sparringspartner & Reflexion (CREATE-Framework)</h4>
-                <p className="text-sm text-slate-300 mb-4 leading-relaxed [text-wrap:pretty]">
-                  Nutze moderne KI als sokratischen Mentor oder Effizienz-Generator für rechtssichere Argumentation und das didaktische Nachgespräch mit Frau Meinhardt.
-                </p>
-                
-                <div className="space-y-4">
-                  <CopyBlock
-                    title="Master-Prompt 1: Sokratischer Reflexionsdialog (Pflegepädagogik & Medizinrecht)"
-                    titleColor="text-amber-500"
-                    content={`C (Character): Agiere als hochqualifizierter Pflegepädagoge und Experte für Medizinrecht und Pflegeethik.
-
-R (Request): Führe mit mir einen fordernden, sokratischen Reflexionsdialog über den Fall 'Erzwungene Aufklärung bei Herrn Müller'. Hilf mir als Praxisanleitung, die juristischen Fallstricke (Arztvorbehalt § 630e BGB, unzulässige Delegation, mangelnde Freiwilligkeit, fragliche Einwilligungsfähigkeit) und die pädagogische Begleitung von Azubi Frau Meinhardt tiefgehend zu analysieren.
-
-E (Examples): Stelle offene, bohrende Leitfragen wie z. B.: "Wenn die Pflegeleitung Druck macht, welche rechtliche Schutzfunktion hat hier das Remonstrationsrecht für dich und Frau Meinhardt?" oder "Wie kannst du Herrn Müllers situative Orientierung im Vorfeld validieren, bevor eine Sedierung überhaupt denkbar ist?"
-
-A (Adjustments): Stelle immer nur EINE einzige präzise Frage auf einmal. Warte zwingend auf meine Antwort! Liefere keine voreiligen Musterlösungen, sondern fordere meine ethische und juristische Urteilskraft heraus.
-
-T (Type of Output): Interaktiver Mentor-Dialog (Chat).
-
-E (Extras): Starte den Dialog, indem du kurz auf den Fall eingehst und mir deine erste Leitfrage zur juristischen und ethischen Ersteinschätzung stellst.
-
-Hier sind meine Daten:
-Fall: Herr Müller (78, sedierungsbedürftige Koloskopie), Azubi Frau Meinhardt soll ärztliche Aufklärung übernehmen
-Meine Einschätzung der Rechtsbrüche:
-${case8Einschaetzung || '[Bitte Stichpunkte zu den Rechtsbrüchen einfügen]'}
-Meine geplanten Interventionen:
-${case8Handlung || '[Bitte Stichpunkte zur Intervention einfügen]'}`}
-                  />
-
-                  {/* Digitaler KI-Helfer & Tools Integration */}
-                  <div className="bg-purple-950/40 border border-purple-500/40 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-md">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center shrink-0 mt-0.5">
-                        <Bot className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded">Spezieller KI-Helfer</span>
-                          <h5 className="font-bold text-white text-sm">Digitaler KI-Helfer für diesen Kurs (Google NotebookLM)</h5>
-                        </div>
-                        <p className="text-xs text-purple-200/80 mt-1 leading-relaxed [text-wrap:pretty]">
-                          Unser KI-Helfer enthält bereits alle Kursunterlagen, Gesetzestexte (§ 630e BGB) und Praxisleitfäden. Kopiere die Master-Prompts oben und nutze sie direkt im interaktiven Notebook!
-                        </p>
-                      </div>
-                    </div>
-                    <a 
-                      href="https://notebook.google.com/notebook/36294d79-a601-4870-a351-53ab8c954ac3" 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-lg transition-colors shadow-lg text-xs sm:text-sm"
-                    >
-                      <Bot className="w-4 h-4" /> Zum KI-Helfer wechseln <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
-                    <a 
-                      href="https://github.com/jansonjanson/AufklaerungEinwilligunSOL/blob/main/Aufklaerungsgespraech.pdf" 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="text-blue-400 hover:text-blue-300 hover:underline inline-flex items-center gap-1.5"
-                    >
-                      <FileText className="w-3.5 h-3.5" /> Quelltext „Aufklärungsgespräch.pdf“ zur Fallanalyse heranziehen
-                    </a>
-
-                    <a 
-                      href="https://gemini.google.com/" 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="text-slate-400 hover:text-slate-200 hover:underline inline-flex items-center gap-1.5"
-                    >
-                      Alternativ: Zu Gemini wechseln <ExternalLink className="w-3 h-3" />
-                    </a>
-                  </div>
-
-                  <CopyBlock
-                    title="Master-Prompt 2: Strukturierter Handlungs- & Dokumentationsleitfaden (Effizienz)"
-                    titleColor="text-emerald-400"
-                    content={`C (Character): Agiere als analytischer Pflegepädagoge und Fachjurist für das Gesundheitswesen.
-
-R (Request): Generiere aus meinen stichpunktartigen Notizen und Handlungsansätzen einen rechtssicheren, strukturierten Handlungs- und Dokumentationsleitfaden sowie einen Entwurf für ein klärendes Gespräch mit der Pflegeleitung und dem Stationsarzt (inkl. Remonstration/Dienstweg).
-
-E (Examples): Gliedere die Antwort in: 1. Sofortmaßnahmen zum Schutz des Patienten (Sedierungsvorbereitung stoppen, Beruhigung), 2. Pädagogisches Schutzkonzept für Frau Meinhardt (Grenze der Delegation erklären), 3. Rechtliche Begründung (§ 630e BGB: Arztvorbehalt), 4. Entwurf eines rechtssicheren Doku-Eintrags im Pflegebericht.
-
-A (Adjustments): Höchste juristische Präzision, deeskalierender aber kompromissloser Ton bzgl. Patientenschutz.
-
-T (Type of Output): Strukturierter Leitfaden mit klaren Handlungsschritten und Formulierungshilfen.
-
-E (Extras): Beziehe meine Notizen ein:
-Notizen zur Situation & Ersteinschätzung:
-${case8Einschaetzung || '[Keine Eingabe]'}
-Geplante Sofortmaßnahmen & Intervention:
-${case8Handlung || '[Keine Eingabe]'}`}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Schritt 4: Board Transfer */}
-            <div className="flex gap-4 p-4 bg-emerald-900/20 rounded-xl border border-emerald-500/30">
-              <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0">4</div>
-              <div className="w-full">
-                <h4 className="font-bold text-emerald-400 mb-1 [text-wrap:balance]">Schritt 4: Transfer ins fobizz Board</h4>
-                <p className="text-sm text-slate-300 mb-3 leading-relaxed [text-wrap:pretty]">Kopiere deine Ausarbeitung und poste deine Erkenntnisse auf unserem fobizz Azubi-Board in der Spalte "Frau Meinhardt", damit alle Beteiligten die Leitlinien nachvollziehen können.</p>
-                {renderBoard("https://app.fobizz.com/pinboard/public_boards/b28a4a86-0543-419d-8d4e-df64affde584?embed=true&token=e57c9cbe6f87eb5d8ee67f6eeacd3cb8", "fobizz Azubi-Board")}
-              </div>
-            </div>
-
-            {renderDocumentationStep(5, 'Frau Meinhardt')}
-          </div>
-        );
-      default:
-        return <div className="text-slate-400 p-8 text-center">Akte wird geladen...</div>;
+    if (allCorrect && onUnlockNote) {
+      onUnlockNote('badge_expert_5');
     }
   };
 
-  const caseInfo = CASES.find(c => c.id === caseId);
+  // Case 6 validation
+  const evaluateCase6 = () => {
+    const correct1 = case6Answers[1] === 'delegationsverbot';
+    const correct2 = case6Answers[2] === 'delegierbar';
+    const correct3 = case6Answers[3] === 'vorbehalt';
+    const correct4 = case6Answers[4] === 'sicherungsaufklaerung';
+
+    const allCorrect = correct1 && correct2 && correct3 && correct4;
+    setCase6Submitted(true);
+    setCase6Passed(allCorrect);
+  };
+
+  // Case 7 validation
+  const evaluateCase7 = () => {
+    // 1: Notfallindikation, 2: Patientenverfügung, 3: Betreuer/Vollmacht, 4: Mutmaßlicher Wille
+    const correct1 = case7Slots[1] === 'notfall';
+    const correct2 = case7Slots[2] === 'verfuegung';
+    const correct3 = case7Slots[3] === 'betreuer';
+    const correct4 = case7Slots[4] === 'mutmasslich';
+
+    const allCorrect = correct1 && correct2 && correct3 && correct4;
+    setCase7Submitted(true);
+    setCase7Passed(allCorrect);
+
+    if (allCorrect && onUnlockNote) {
+      onUnlockNote('badge_expert_7');
+    }
+  };
 
   return (
-    <div className="relative h-full flex flex-col">
-      <div className="border-b border-slate-800 pb-6 mb-6 shrink-0">
-        <span className="text-amber-500 font-black text-xs tracking-widest uppercase block mb-1">{caseInfo?.tag}</span>
-        <h2 className="text-2xl font-black text-white tracking-tight [text-wrap:balance]">{caseInfo?.title}</h2>
-        <p className="text-slate-300 mt-2 leading-relaxed [text-wrap:pretty]">{caseInfo?.subtitle}</p>
-      </div>
+    <div className="space-y-6 max-w-4xl mx-auto pb-12">
+      {/* CASE 01: RAUM 01 ANMELDUNG */}
+      {caseId === 1 && (
+        <div className="space-y-6">
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+            <span className="px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 font-black text-xs uppercase tracking-wider">Raum 01: Anmeldung</span>
+            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 01: Rechtliche Aspekte der Aufklärung</h2>
+            <p className="text-slate-300 text-sm mt-2 leading-relaxed [text-wrap:pretty]">
+              Lieber Kurs, bevor Sie zu den Patient:innen gehen, müssen die rechtlichen Rahmenbedingungen absolut klar sein. Lesen Sie sich die folgenden juristischen Kernauszüge aus dem BGB und dem CNE-Fachartikel sorgfältig durch. Für ein tieferes Verständnis laden Sie sich das vollständige PDF herunter.
+            </p>
 
-      <div className="pb-8 flex-1">
-        {renderContent()}
-      </div>
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-2.5 mt-4 pt-3 border-t border-slate-800">
+              <a 
+                href="https://www.gesetze-im-internet.de/bgb/__630d.html" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg text-xs font-bold transition-colors border border-slate-700 shadow-sm"
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-blue-400" /> § 630d BGB auf gesetze-im-internet.de
+              </a>
+              <a 
+                href="https://www.gesetze-im-internet.de/bgb/__630e.html" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg text-xs font-bold transition-colors border border-slate-700 shadow-sm"
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-blue-400" /> § 630e BGB auf gesetze-im-internet.de
+              </a>
+              <a 
+                href="https://github.com/jansonjanson/AufklaerungEinwilligunSOL/blob/main/Aufklaerungsgespraech.pdf?raw=true" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white rounded-lg text-xs font-bold transition-colors border border-blue-500/40 shadow-sm"
+              >
+                <FileText className="w-3.5 h-3.5" /> Vollständigen Artikel herunterladen (.pdf)
+              </a>
+            </div>
+          </div>
 
-      {/* Fullscreen Board Modal */}
-      {boardModal && typeof document !== 'undefined' && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-6 bg-slate-950/90 backdrop-blur-sm pointer-events-auto">
-          <div className="w-full max-w-[95vw] h-[95vh] bg-slate-900 rounded-2xl flex flex-col border border-slate-700 overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
-            <div className="flex justify-between items-center p-4 sm:p-6 border-b border-slate-800 bg-slate-850 shrink-0">
-              <h3 className="font-bold text-white flex items-center gap-2 [text-wrap:balance]"><Maximize2 className="w-5 h-5 text-amber-500" /> fobizz Board (Vollbild)</h3>
-              <div className="flex items-center gap-4">
-                <a href={boardModal.replace('?embed=true&', '?')} target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:text-amber-400 text-sm font-bold flex items-center gap-1">
-                  <ExternalLink className="w-4 h-4" /> Neuen Tab öffnen
-                </a>
-                <button onClick={() => setBoardModal(null)} className="text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors">
-                  Schließen
+          {/* In-Game-Document-Viewer */}
+          <div className="bg-slate-900 border-2 border-slate-700 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="bg-slate-850 px-4 py-3 border-b border-slate-700 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-amber-400" />
+                <span className="text-xs font-bold uppercase tracking-widest text-slate-200">In-Game-Dokument: Juristischer Fachtext & Gesetzestexte</span>
+              </div>
+              <button 
+                onClick={() => onUnlockNote && onUnlockNote('easter_egg_bgb')}
+                className="text-slate-500 hover:text-amber-400 transition-colors p-1"
+                title="BGB-Auszug untersuchen"
+              >
+                <Book className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div className="p-5 sm:p-6 bg-slate-950/90 text-slate-300 font-serif text-sm leading-relaxed max-h-96 overflow-y-auto space-y-5 border-t border-slate-900 shadow-inner">
+              <div className="border-l-4 border-amber-500 pl-4 py-1 bg-amber-500/5 rounded-r">
+                <h4 className="font-sans font-black text-amber-400 text-xs uppercase tracking-widest mb-1">Bürgerliches Gesetzbuch (BGB) – Auszug</h4>
+                <p className="font-bold text-white text-sm">§ 630d Einwilligung</p>
+                <p className="mt-1 text-xs sm:text-sm text-slate-300">
+                  (1) Vor Durchführung einer medizinischen Maßnahme [...] ist der Behandelnde verpflichtet, die Einwilligung des Patienten einzuholen.<br />
+                  (2) Die Wirksamkeit der Einwilligung setzt voraus, dass der Patient vor der Einwilligung [...] aufgeklärt worden ist.
+                </p>
+              </div>
+
+              <div className="border-l-4 border-blue-500 pl-4 py-1 bg-blue-500/5 rounded-r">
+                <p className="font-bold text-white text-sm">§ 630e Aufklärungspflichten</p>
+                <p className="mt-1 text-xs sm:text-sm text-slate-300">
+                  (1) Der Behandelnde ist verpflichtet, den Patienten über sämtliche für die Einwilligung wesentlichen Umstände aufzuklären. [...]<br />
+                  (2) Die Aufklärung muss:
+                </p>
+                <ul className="list-disc list-inside mt-1 text-xs sm:text-sm text-slate-300 space-y-1">
+                  <li><strong>mündlich durch den Behandelnden</strong> oder durch eine Person erfolgen, die über die zur Durchführung der Maßnahme notwendige Ausbildung verfügt; ergänzend kann auch auf Unterlagen Bezug genommen werden [...],</li>
+                  <li><strong>so rechtzeitig erfolgen</strong>, dass der Patient seine Entscheidung [...] wohlüberlegt treffen kann.</li>
+                </ul>
+              </div>
+
+              <div className="border-t border-slate-800 pt-4">
+                <h4 className="font-sans font-black text-blue-400 text-xs uppercase tracking-widest mb-2">CNE-Artikel: Aufklärung und Einwilligung in der Praxis</h4>
+                <div className="space-y-2 text-xs sm:text-sm font-sans text-slate-300">
+                  <p>
+                    <strong className="text-white">I. Tatbestand der Körperverletzung:</strong> Jeder ärztliche Heileingriff stellt tatbestandlich eine Körperverletzung dar (§ 223 StGB). Dies gilt für Operationen, Punktionen und sogar einfache Blutentnahmen. Fehlt die wirksame Einwilligung, ist der Eingriff rechtswidrig.
+                  </p>
+                  <p>
+                    <strong className="text-white">II. Unzulässigkeit der Delegation:</strong> Die Aufklärung muss durch einen Arzt erfolgen, eine Delegation an nichtärztliches Personal ist unstatthaft.
+                  </p>
+                  <p>
+                    <strong className="text-white">III. Urteilskraft und Gemütsruhe:</strong> Die Einholung der ausdrücklichen Einwilligung hat vor dem Eingriff zu erfolgen; sie erfordert die nötige Urteilskraft und Gemütsruhe des Patienten. Das alleinige Aushändigen eines Bogens reicht nicht.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Arbeitsauftrag 1 */}
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+            <h3 className="font-bold text-white text-base mb-1">Arbeitsauftrag:</h3>
+            <p className="text-slate-300 text-sm mb-4 leading-relaxed [text-wrap:pretty]">
+              Posten Sie in die untenstehende Box in eigenen Worten Ihre <strong>drei wichtigsten Erkenntnisse</strong> aus dem Text. (Kein Copy-Paste!).
+            </p>
+
+            <StyledTextarea 
+              label="Ihre 3 wichtigsten juristischen Erkenntnisse"
+              placeholder="1. Körperverletzung: ...&#10;2. Arztvorbehalt: ...&#10;3. Urteilskraft & Gemütsruhe: ..."
+              value={case1Notes}
+              onChange={(e: any) => setCase1Notes(e.target.value)}
+              color="blue"
+            />
+
+            <div className="flex flex-wrap items-center gap-3 mt-4">
+              <button 
+                onClick={() => setCase1ShowSolution(!case1ShowSolution)}
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-700"
+              >
+                {case1ShowSolution ? 'Musterlösung verbergen' : 'Erkenntnisse mit KI-Tutor / Musterlösung abgleichen'}
+              </button>
+            </div>
+
+            {case1ShowSolution && (
+              <div className="mt-4 p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/40 text-xs sm:text-sm text-slate-200 space-y-2 animate-in fade-in">
+                <h5 className="font-black text-emerald-400 uppercase tracking-wider text-xs">Musterlösung:</h5>
+                <p>Hervorragend. Vergleichen Sie Ihre Notizen mit diesen juristischen Kernfakten:</p>
+                <ul className="list-disc list-inside space-y-1.5 text-slate-300">
+                  <li><strong className="text-white">Körperverletzung:</strong> Jeder Eingriff (auch eine Blutentnahme) ist rechtlich eine Körperverletzung und zwingend einwilligungspflichtig (§ 223 StGB).</li>
+                  <li><strong className="text-white">Arztvorbehalt & Mündlichkeit:</strong> Die Aufklärung darf niemals an die Pflege delegiert werden, sie muss mündlich durch einen Arzt erfolgen (§ 630e BGB). Ein Formular allein reicht nicht.</li>
+                  <li><strong className="text-white">Urteilskraft:</strong> Die Einwilligung erfordert absolute Urteilskraft und Gemütsruhe des Patienten zum Zeitpunkt der Unterschrift.</li>
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* CASE 02: RAUM 01 ANMELDUNG */}
+      {caseId === 2 && (
+        <div className="space-y-6">
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+            <span className="px-2.5 py-1 rounded-md bg-blue-500/20 text-blue-400 font-black text-xs uppercase tracking-wider">Raum 01: Anmeldung</span>
+            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 02: Patientenaufklärung in der Praxis (Videos)</h2>
+            <p className="text-slate-300 text-sm mt-2 leading-relaxed [text-wrap:pretty]">
+              Die Theorie sitzt. Sehen Sie sich nun die beiden Praxis-Videos der Rechtsdepesche (mit Prof. Dr. med. Helmut Frohnhofen) an. Hier wird die wichtige Abgrenzung zwischen ärztlicher und pflegerischer Aufklärung sowie die Bedeutung des 'Aufklärungsverzichts' deutlich.
+            </p>
+          </div>
+
+          {/* Video 1 */}
+          <VideoPlayerBlock 
+            title="Juristische Aspekte der Patientenaufklärung"
+            subtitle="Aufklärungspflicht, Beweislastumkehr (§ 630h BGB) und unzulässige Delegation"
+            youtubeId="sg50e_i_PT8"
+            linkUrl="https://youtu.be/sg50e_i_PT8?si=nvHiyiHJ7gEWW5Dt"
+          />
+
+          {/* Video 2 */}
+          <VideoPlayerBlock 
+            title="Patienten RICHTIG aufklären! – Prof. Dr. med. Helmut Frohnhofen"
+            subtitle="Rechtsdepesche: Praktische Kommunikation, Vulnerabilität & Aufklärungsverzicht"
+            youtubeId="dUTMy6FxXuU"
+            linkUrl="https://youtu.be/dUTMy6FxXuU?si=DPZRasFGxlk4F8RM"
+          />
+
+          {/* Arbeitsauftrag 2 */}
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4">
+            <div>
+              <h3 className="font-bold text-white text-base mb-1">Arbeitsauftrag:</h3>
+              <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
+                Die Videos unterscheiden zwei wesentliche Aufklärungstypen. Definieren Sie in den Feldern, worum es sich handelt und wer die Verantwortung trägt.
+              </p>
+            </div>
+
+            <StyledTextarea 
+              label="Definition & Zuständigkeit: Selbstbestimmungsaufklärung (Eingriffsaufklärung)"
+              description="Was umfasst diese Aufklärung und wer darf sie ausschließlich durchführen?"
+              placeholder="Definition, Inhalte (Risiken, Diagnose, Alternativen) und ärztliche Zuständigkeit..."
+              value={case2DefSelbst}
+              onChange={(e: any) => setCase2DefSelbst(e.target.value)}
+              color="amber"
+            />
+
+            <StyledTextarea 
+              label="Definition & Zuständigkeit: Therapeutische Aufklärung (Sicherungsaufklärung)"
+              description="Was umfasst diese Aufklärung und welche Rolle spielen Pflegefachkräfte?"
+              placeholder="Definition, therapie-sicherndes Verhalten (z.B. Sturzprophylaxe, Nüchternheit, Diabetisches Fußsyndrom) und pflegerische Verantwortung..."
+              value={case2DefSicher}
+              onChange={(e: any) => setCase2DefSicher(e.target.value)}
+              color="emerald"
+            />
+
+            <button 
+              onClick={() => setCase2ShowSolution(!case2ShowSolution)}
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-700"
+            >
+              {case2ShowSolution ? 'Musterlösung verbergen' : 'Musterlösung anzeigen'}
+            </button>
+
+            {case2ShowSolution && (
+              <div className="mt-4 p-4 rounded-xl bg-emerald-950/30 border border-emerald-500/40 text-xs sm:text-sm text-slate-200 space-y-2 animate-in fade-in">
+                <h5 className="font-black text-emerald-400 uppercase tracking-wider text-xs">Musterlösung:</h5>
+                <p>Bitte prüfen Sie Ihre Definitionen:</p>
+                <div className="space-y-2 text-slate-300">
+                  <p>
+                    <strong className="text-amber-400">Selbstbestimmungsaufklärung:</strong> Klärt über Risiken, Nebenwirkungen, Diagnosen und Behandlungsmethoden auf. Sie ist Grundlage für den freien Willen des Patienten.<br />
+                    <strong className="text-white">Zuständigkeit:</strong> Ausschließliche ärztliche Pflicht (striktes Delegationsverbot).
+                  </p>
+                  <p>
+                    <strong className="text-emerald-400">Therapeutische Aufklärung / Sicherungsaufklärung:</strong> Der Patient wird ins Bild gesetzt, wie er sich verhalten muss, um den Heilungserfolg nicht zu gefährden (Compliance), z.B. beim Diabetischen Fußsyndrom, Nüchternheitsregeln oder Sturzprophylaxe.<br />
+                    <strong className="text-white">Zuständigkeit:</strong> Hier tragen auch Pflegefachkräfte eine hohe Eigenverantwortung bei der Anleitung und Edukation.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* CASE 03: RAUM 02 PATIENTENZIMMER */}
+      {caseId === 3 && (
+        <div className="space-y-6">
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+            <span className="px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-400 font-black text-xs uppercase tracking-wider">Raum 02: Patientenzimmer</span>
+            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 03: Die Prämedikation (Fallvignette)</h2>
+            <p className="text-slate-300 text-sm mt-2 leading-relaxed [text-wrap:pretty]">
+              Wenden Sie Ihr juristisches Wissen auf ein typisches operatives Krankenhausszenario an.
+            </p>
+          </div>
+
+          {/* Szenario-Block */}
+          <div className="bg-amber-950/20 border-2 border-amber-500/50 p-5 rounded-2xl shadow-lg relative">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertTriangle className="w-5 h-5 text-amber-400" />
+              <h3 className="font-black text-amber-400 text-sm uppercase tracking-wider">Fallvignette: Herr Yilmaz (65)</h3>
+            </div>
+            <p className="text-slate-200 text-sm sm:text-base leading-relaxed [text-wrap:pretty]">
+              „Herr Yilmaz (65) soll am Vormittag operiert werden. Am Morgen, kurz nach der Gabe eines stark beruhigenden Medikaments (Prämedikation), wird er in der OP-Schleuse vom Assistenzarzt über den bevorstehenden Eingriff aufgeklärt. Herr Yilmaz wirkt sehr schläfrig, nickt aber und unterschreibt den Aufklärungsbogen.“
+            </p>
+          </div>
+
+          {/* Arbeitsauftrag */}
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4">
+            <div>
+              <h3 className="font-bold text-white text-base mb-1">Arbeitsauftrag:</h3>
+              <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
+                Bewerten Sie aus rechtlicher Sicht die Wirksamkeit der Einwilligung von Herrn Yilmaz. Was lief falsch? Begründen Sie Ihre Einschätzung kurz und fachlich korrekt in der Box.
+              </p>
+            </div>
+
+            <StyledTextarea 
+              label="Ihre juristische Bewertung"
+              placeholder="Begründen Sie, warum die Einwilligung wirksam oder unwirksam ist (Urteilskraft, zeitlicher Vorlauf, Konsequenzen)..."
+              value={case3Evaluation}
+              onChange={(e: any) => setCase3Evaluation(e.target.value)}
+              color="amber"
+            />
+
+            <button 
+              onClick={() => setCase3ShowSolution(!case3ShowSolution)}
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-700"
+            >
+              {case3ShowSolution ? 'Musterlösung verbergen' : 'Musterlösung anzeigen'}
+            </button>
+
+            {case3ShowSolution && (
+              <div className="mt-4 p-5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 text-xs sm:text-sm text-slate-200 space-y-3 animate-in fade-in">
+                <h5 className="font-black text-emerald-400 uppercase tracking-wider text-xs">Musterlösung:</h5>
+                <p className="font-bold text-white">Die Einwilligung ist unwirksam. Begründung:</p>
+                <ol className="list-decimal list-inside space-y-2 text-slate-300">
+                  <li>
+                    <strong className="text-white">Fehlende Urteilskraft & Gemütsruhe:</strong> Herr Yilmaz war durch die Prämedikation medikamentös beeinflusst und besaß nicht mehr die nötige „Urteilskraft und Gemütsruhe“, um die Tragweite der Erklärung zu erfassen.
+                  </li>
+                  <li>
+                    <strong className="text-white">Verletzung der Rechtzeitigkeit:</strong> Es gab keine deutliche Trennung zwischen dem Aufklärungsgespräch und dem Behandlungsgeschehen. Der Patient muss die Möglichkeit haben, die Entscheidung zu reflektieren (ausreichender zeitlicher Vorlauf, bei elektiven Eingriffen mind. 24h!).
+                  </li>
+                </ol>
+                <div className="p-3 bg-rose-950/40 border border-rose-500/40 rounded-lg text-rose-300 font-bold">
+                  Folge: Der Eingriff wäre mangels wirksamer Einwilligung eine strafbare Körperverletzung (§ 223 StGB).
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* CASE 04: RAUM 02 PATIENTENZIMMER */}
+      {caseId === 4 && (
+        <div className="space-y-6">
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+            <span className="px-2.5 py-1 rounded-md bg-amber-500/20 text-amber-400 font-black text-xs uppercase tracking-wider">Raum 02: Patientenzimmer</span>
+            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 04: Formen der Einwilligung (Mini-Fälle)</h2>
+            <p className="text-slate-300 text-sm mt-2 leading-relaxed [text-wrap:pretty]">
+              Einwilligungen müssen nicht immer schriftlich erfolgen. Ordnen Sie den folgenden vier pflegerischen und ärztlichen Alltagssituationen die korrekte juristische Form zu.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <StyledTextarea 
+              step="1"
+              label="Szenario 1: Blutentnahme"
+              description="Sie kommen zur routinemäßigen Blutentnahme (venös). Frau Kowalski streckt Ihnen freiwillig den Arm entgegen. Welche Einwilligungsform liegt vor?"
+              placeholder="Welche Einwilligungsform liegt vor? (z.B. konkludent...)"
+              value={case4S1}
+              onChange={(e: any) => setCase4S1(e.target.value)}
+              color="blue"
+            />
+
+            <StyledTextarea 
+              step="2"
+              label="Szenario 2: Notfallversorgung"
+              description="Ein bewusstloser Patient wird nach einem schweren Autounfall blutend eingeliefert (es droht Lebensgefahr). Keine Angehörigen erreichbar. Auf welcher Basis wird notoperiert?"
+              placeholder="Welche rechtliche Grundlage / Einwilligungsform greift hier?"
+              value={case4S2}
+              onChange={(e: any) => setCase4S2(e.target.value)}
+              color="amber"
+            />
+
+            <StyledTextarea 
+              step="3"
+              label="Szenario 3: Geplante Operation"
+              description="Geplante, komplexe Hüft-TEP-Operation in 3 Wochen."
+              placeholder="Welche Form der Einwilligung und Aufklärung ist hier zwingend?"
+              value={case4S3}
+              onChange={(e: any) => setCase4S3(e.target.value)}
+              color="purple"
+            />
+
+            <StyledTextarea 
+              step="4"
+              label="Szenario 4: Verzicht auf Risikoaufklärung"
+              description="Ein Arzt beginnt mit der ausführlichen Risikoaufklärung. Der Patient unterbricht ihn: 'Bitte hören Sie auf, ich will die Horror-Risiken gar nicht wissen, operieren Sie einfach.' Darf der Arzt aufhören?"
+              placeholder="Rechtliche Einordnung und Dokumentationspflicht..."
+              value={case4S4}
+              onChange={(e: any) => setCase4S4(e.target.value)}
+              color="rose"
+            />
+
+            <button 
+              onClick={() => setCase4ShowSolution(!case4ShowSolution)}
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-700"
+            >
+              {case4ShowSolution ? 'Musterlösung verbergen' : 'Musterlösung anzeigen'}
+            </button>
+
+            {case4ShowSolution && (
+              <div className="p-5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 text-xs sm:text-sm text-slate-200 space-y-3 animate-in fade-in">
+                <h5 className="font-black text-emerald-400 uppercase tracking-wider text-xs">Hier ist die juristische Einordnung:</h5>
+                <ul className="space-y-2 text-slate-300">
+                  <li>
+                    <strong className="text-blue-400">Szenario 1:</strong> <strong>Konkludente (stillschweigende) Einwilligung.</strong> Das schlüssige Verhalten (Arm hinhalten) reicht bei Routineeingriffen aus.
+                  </li>
+                  <li>
+                    <strong className="text-amber-400">Szenario 2:</strong> <strong>Mutmaßliche Einwilligung.</strong> In unaufschiebbaren Notfällen (Gefahr im Verzug) wird im mutmaßlichen Sinne des Patienten gehandelt.
+                  </li>
+                  <li>
+                    <strong className="text-purple-400">Szenario 3:</strong> <strong>Ausdrückliche (meist schriftliche) Einwilligung</strong> nach rechtzeitiger Selbstbestimmungsaufklärung.
+                  </li>
+                  <li>
+                    <strong className="text-rose-400">Szenario 4:</strong> <strong>Aufklärungsverzicht.</strong> Ja, der Patient darf verzichten. <strong className="text-white">WICHTIG:</strong> Dies muss zur rechtlichen Absicherung zwingend dokumentiert werden!
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* CASE 05: RAUM 03 STATIONSZIMMER (JURA-QUIZ) */}
+      {caseId === 5 && (
+        <div className="space-y-6">
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+            <span className="px-2.5 py-1 rounded-md bg-purple-500/20 text-purple-400 font-black text-xs uppercase tracking-wider">Raum 03: Stationszimmer</span>
+            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 05: Das große Jura-Quiz</h2>
+            <p className="text-slate-300 text-sm mt-2 leading-relaxed [text-wrap:pretty]">
+              Sie kennen nun die Theorie aus Raum 01 und 02. Bevor Sie im ärztlichen Dienst intervenieren dürfen, müssen die harten juristischen Fakten sitzen.
+            </p>
+          </div>
+
+          <div className="space-y-5">
+            {/* Frage 1 */}
+            <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl space-y-3">
+              <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">Frage 1 (Single Choice): Der rechtliche Status des OP-Eingriffs</span>
+              <p className="text-sm font-bold text-white">
+                Wie wird ein operativer Heileingriff (z.B. Appendektomie) nach ständiger Rechtsprechung des BGH rechtlich bewertet, bevor eine wirksame Einwilligung vorliegt?
+              </p>
+              <div className="space-y-2 text-xs sm:text-sm">
+                {[
+                  { id: 'A', text: 'Als rechtmäßiger Heileingriff, sofern er medizinisch indiziert ist.' },
+                  { id: 'B', text: 'Als tatbestandliche Körperverletzung (§ 223 StGB).' },
+                  { id: 'C', text: 'Als vertragliche Dienstleistung.' }
+                ].map((opt) => (
+                  <label key={opt.id} className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${case5Q1 === opt.id ? 'bg-purple-950/40 border-purple-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'}`}>
+                    <input 
+                      type="radio" 
+                      name="q1" 
+                      checked={case5Q1 === opt.id} 
+                      onChange={() => setCase5Q1(opt.id)}
+                      className="accent-purple-500" 
+                    />
+                    <span><strong>{opt.id})</strong> {opt.text}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Frage 2 */}
+            <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl space-y-3">
+              <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">Frage 2 (Multiple Choice): Formen der Einwilligung</span>
+              <p className="text-sm font-bold text-white">
+                Welche Aussagen zu Einwilligungsformen sind richtig? (Wählen Sie alle passenden aus)
+              </p>
+              <div className="space-y-2 text-xs sm:text-sm">
+                {[
+                  { id: 'A', text: 'Eine konkludente Einwilligung liegt z. B. vor, wenn der Patient bei der Blutentnahme freiwillig den Arm hinstreckt.' },
+                  { id: 'B', text: 'Eine mutmaßliche Einwilligung kann nur angenommen werden, wenn der Patient zuvor ausdrücklich zugestimmt hat.' },
+                  { id: 'C', text: 'Eine hypothetische Einwilligung liegt vor, wenn bei lückenhafter Aufklärung der Patient bei Kenntnis aller Umstände trotzdem eingewilligt hätte.' },
+                  { id: 'D', text: 'Eine ausdrückliche Einwilligung muss immer schriftlich erfolgen, sonst ist sie ungültig.' },
+                  { id: 'E', text: 'Eine mutmaßliche Einwilligung kann bei Bewusstlosigkeit angenommen werden, wenn der Eingriff dem mutmaßlichen Willen entspricht.' }
+                ].map((opt) => (
+                  <label key={opt.id} className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${case5Q2[opt.id] ? 'bg-purple-950/40 border-purple-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'}`}>
+                    <input 
+                      type="checkbox" 
+                      checked={case5Q2[opt.id]} 
+                      onChange={(e) => setCase5Q2({ ...case5Q2, [opt.id]: e.target.checked })}
+                      className="accent-purple-500 mt-0.5" 
+                    />
+                    <span><strong>{opt.id})</strong> {opt.text}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Frage 3 */}
+            <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl space-y-3">
+              <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">Frage 3 (Richtig oder Falsch?): Einwilligungsfähigkeit vs. Geschäftsfähigkeit</span>
+              <p className="text-sm font-bold text-white">
+                „Die Einwilligungsfähigkeit eines Patienten ist rechtlich absolut identisch mit seiner Geschäftsfähigkeit (ab 18 Jahren).“
+              </p>
+              <div className="flex gap-3 text-xs sm:text-sm">
+                <button 
+                  type="button" 
+                  onClick={() => setCase5Q3(true)} 
+                  className={`flex-1 p-3 rounded-lg border font-bold transition-colors ${case5Q3 === true ? 'bg-purple-600 text-white border-purple-500' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'}`}
+                >
+                  Richtig
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setCase5Q3(false)} 
+                  className={`flex-1 p-3 rounded-lg border font-bold transition-colors ${case5Q3 === false ? 'bg-purple-600 text-white border-purple-500' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'}`}
+                >
+                  Falsch
                 </button>
               </div>
             </div>
-            <div className="flex-1 w-full bg-white relative overflow-auto -webkit-overflow-scrolling-touch">
-              <iframe src={boardModal} frameBorder="0" className="absolute inset-0 w-full h-full" allowFullScreen style={{ minHeight: '100%' }}></iframe>
+
+            {/* Frage 4 */}
+            <div className="bg-slate-900 border border-slate-800 p-5 rounded-xl space-y-3">
+              <span className="text-xs font-bold text-purple-400 uppercase tracking-wider">Frage 4 (Single Choice): Zeitpunkt der Aufklärung</span>
+              <p className="text-sm font-bold text-white">
+                Wann muss die Aufklärung bei einem größeren, elektiven operativen Eingriff spätestens erfolgen?
+              </p>
+              <div className="space-y-2 text-xs sm:text-sm">
+                {[
+                  { id: 'A', text: 'Unmittelbar auf dem Weg in den OP, solange der Patient noch wach ist.' },
+                  { id: 'B', text: 'Am Vorabend oder im Idealfall mit einem zeitlichen Vorlauf von mindestens 24 Stunden, damit ausreichend Bedenkzeit verbleibt.' },
+                  { id: 'C', text: 'Nach Einleitung der Narkose.' }
+                ].map((opt) => (
+                  <label key={opt.id} className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${case5Q4 === opt.id ? 'bg-purple-950/40 border-purple-500 text-white' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'}`}>
+                    <input 
+                      type="radio" 
+                      name="q4" 
+                      checked={case5Q4 === opt.id} 
+                      onChange={() => setCase5Q4(opt.id)}
+                      className="accent-purple-500" 
+                    />
+                    <span><strong>{opt.id})</strong> {opt.text}</span>
+                  </label>
+                ))}
+              </div>
             </div>
+
+            <button 
+              onClick={evaluateCase5}
+              className="w-full py-3.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-sm uppercase tracking-wider shadow-lg transition-colors"
+            >
+              Quiz auswerten & Freischaltung prüfen
+            </button>
+
+            {case5Submitted && (
+              <div className={`p-4 rounded-xl border text-sm ${case5Passed ? 'bg-emerald-950/40 border-emerald-500 text-emerald-300' : 'bg-rose-950/40 border-rose-500 text-rose-300'}`}>
+                {case5Passed ? (
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                    <div>
+                      <strong>Hervorragend gelöst!</strong> Alle 4 Fragen wurden juristisch präzise beantwortet. Badge <strong>„Jura-Ass (Akte 05)“</strong> freigeschaltet!
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
+                    <div>
+                      <strong>Noch nicht ganz korrekt.</strong> Bitte überprüfen Sie Ihre Antworten (Tipp: Frage 2 hat 3 richtige Antworten, Frage 3 ist FALSCH, da Einwilligungsfähigkeit auf natürlicher Urteilskraft beruht).
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        </div>,
-        document.body
+        </div>
       )}
 
-      {/* Large QR Modal */}
-      {largeQr && typeof document !== 'undefined' && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm pointer-events-auto" onClick={() => setLargeQr(null)}>
-          <div className="bg-white p-8 rounded-2xl shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col items-center" onClick={e => e.stopPropagation()}>
-            <img src={largeQr} alt="QR Code Large" className="w-64 h-64 sm:w-80 sm:h-80 mx-auto" />
-            <button onClick={() => setLargeQr(null)} className="mt-8 w-full py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors uppercase tracking-widest">Schließen</button>
+      {/* CASE 06: RAUM 03 STATIONSZIMMER (GRENZEN DER DELEGATION) */}
+      {caseId === 6 && (
+        <div className="space-y-6">
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+            <span className="px-2.5 py-1 rounded-md bg-purple-500/20 text-purple-400 font-black text-xs uppercase tracking-wider">Raum 03: Stationszimmer</span>
+            <div className="flex items-center justify-between mt-2">
+              <h2 className="text-xl sm:text-2xl font-black text-white">Akte 06: Die Grenzen der Delegation</h2>
+              <button 
+                onClick={() => onUnlockNote && onUnlockNote('easter_egg_shield')}
+                className="text-slate-500 hover:text-amber-400 transition-colors p-1"
+                title="Schutzschild der Pflege untersuchen"
+              >
+                <Shield className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-slate-300 text-sm mt-2 leading-relaxed [text-wrap:pretty]">
+              Als Pflegefachkraft arbeiten Sie in vertikaler Arbeitsteilung mit dem ärztlichen Dienst. Aber nicht alles ist delegierbar. Ordnen Sie zu, in wessen Verantwortungsbereich die folgenden Aufgaben fallen.
+            </p>
           </div>
-        </div>,
-        document.body
+
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4">
+            {[
+              { id: 1, text: 'Aufklärung über seltene, aber typische Operationsrisiken.' },
+              { id: 2, text: 'Venöse Blutentnahme und subkutane Injektionen.' },
+              { id: 3, text: 'Feststellung des individuellen Pflegebedarfs.' },
+              { id: 4, text: 'Aufklärung des Patienten über das Sturzrisiko nach Schlafmittelgabe.' }
+            ].map((task) => (
+              <div key={task.id} className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                <div className="flex items-start gap-2">
+                  <span className="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">{task.id}</span>
+                  <p className="text-white text-xs sm:text-sm font-bold">{task.text}</p>
+                </div>
+                <select 
+                  value={case6Answers[task.id]} 
+                  onChange={(e) => setCase6Answers({ ...case6Answers, [task.id]: e.target.value })}
+                  className="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-xs sm:text-sm text-slate-200 outline-none focus:border-purple-500"
+                >
+                  <option value="">-- Verantwortungsbereich auswählen --</option>
+                  <option value="delegationsverbot">Absolutes Delegationsverbot (Ärztliche Kernaufgabe)</option>
+                  <option value="delegierbar">Delegierbare ärztliche Maßnahme (Behandlungspflege)</option>
+                  <option value="vorbehalt">Pflegerische Vorbehaltsaufgabe (§ 4 PflBG)</option>
+                  <option value="sicherungsaufklaerung">Pflegerische Sicherungsaufklärung</option>
+                </select>
+              </div>
+            ))}
+
+            <button 
+              onClick={evaluateCase6}
+              className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-black text-sm uppercase tracking-wider shadow-lg transition-colors"
+            >
+              Zuordnung überprüfen
+            </button>
+
+            {case6Submitted && (
+              <div className={`p-4 rounded-xl border text-sm ${case6Passed ? 'bg-emerald-950/40 border-emerald-500 text-emerald-300' : 'bg-rose-950/40 border-rose-500 text-rose-300'}`}>
+                {case6Passed ? (
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                    <div>
+                      <strong>Perfekt zugeordnet!</strong> Die rechtlichen Grenzen zwischen Arztvorbehalt, Behandlungs- und Sicherungspflege sind eindeutig geklärt.
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
+                    <div>
+                      <strong>Einige Zuordnungen stimmen noch nicht.</strong> Denken Sie daran: Risikoaufklärung = Arztvorbehalt, Blutentnahme = delegierbare Maßnahme, Pflegebedarf = Vorbehalt § 4 PflBG, Sturzrisiko = Sicherungsaufklärung.
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* CASE 07: RAUM 04 ARZTZIMMER (ESKALATIONSMODELL) */}
+      {caseId === 7 && (
+        <div className="space-y-6">
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+            <span className="px-2.5 py-1 rounded-md bg-rose-500/20 text-rose-400 font-black text-xs uppercase tracking-wider">Raum 04: Arztzimmer</span>
+            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 07: Das Eskalationsmodell (Willensermittlung)</h2>
+            <p className="text-slate-300 text-sm mt-2 leading-relaxed [text-wrap:pretty]">
+              Ein bewusstloser Notfallpatient wird eingeliefert. Ordnen Sie die rechtlichen Stufen der Willensermittlung in die korrekte chronologische Reihenfolge, bevor Sie handeln.
+            </p>
+          </div>
+
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4">
+            {[1, 2, 3, 4].map((slotNum) => (
+              <div key={slotNum} className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <span className="text-xs font-black uppercase tracking-wider text-rose-400 shrink-0">Stufe {slotNum}:</span>
+                <select 
+                  value={case7Slots[slotNum]} 
+                  onChange={(e) => setCase7Slots({ ...case7Slots, [slotNum]: e.target.value })}
+                  className="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-lg text-xs sm:text-sm text-slate-200 outline-none focus:border-rose-500"
+                >
+                  <option value="">-- Stufe auswählen --</option>
+                  <option value="mutmasslich">Mutmaßlicher Wille (Ethische Abwägung)</option>
+                  <option value="verfuegung">Suche nach Patientenverfügung</option>
+                  <option value="notfall">Notfallindikation (Sofortiges Handeln bei Lebensgefahr)</option>
+                  <option value="betreuer">Gesetzlicher Betreuer / Vorsorgevollmacht</option>
+                </select>
+              </div>
+            ))}
+
+            <button 
+              onClick={evaluateCase7}
+              className="w-full py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-sm uppercase tracking-wider shadow-lg transition-colors"
+            >
+              Reihenfolge überprüfen
+            </button>
+
+            {case7Submitted && (
+              <div className={`p-4 rounded-xl border text-sm ${case7Passed ? 'bg-emerald-950/40 border-emerald-500 text-emerald-300' : 'bg-rose-950/40 border-rose-500 text-rose-300'}`}>
+                {case7Passed ? (
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                    <div>
+                      <strong>Hervorragend!</strong> Sie haben das Eskalationsmodell fehlerfrei durchschaut. Badge <strong>„Ethik-Experte (Akte 07)“</strong> freigeschaltet!
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
+                    <div>
+                      <strong>Reihenfolge noch nicht ganz richtig.</strong> Chronologie: 1. Notfallindikation → 2. Suche nach Patientenverfügung → 3. Gesetzlicher Betreuer / Vorsorgevollmacht → 4. Mutmaßlicher Wille.
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* CASE 08: RAUM 04 ARZTZIMMER (KI-LABOR & REMONSTRATION) */}
+      {caseId === 8 && (
+        <div className="space-y-6">
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+            <span className="px-2.5 py-1 rounded-md bg-rose-500/20 text-rose-400 font-black text-xs uppercase tracking-wider">Raum 04: Arztzimmer</span>
+            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 08: KI-Labor & Remonstration</h2>
+            <p className="text-slate-300 text-sm mt-2 leading-relaxed [text-wrap:pretty]">
+              Üben Sie das rechtssichere Handeln und die professionelle Remonstration bei unzulässiger Delegation mithilfe sokratischer KI-Prompts.
+            </p>
+          </div>
+
+          {/* Schritt 1: Beobachtung */}
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-rose-500 text-white font-black text-xs flex items-center justify-center">1</span>
+              <h3 className="font-bold text-white text-base">Schritt 1: Reale Konfliktsituation (Herr Chen)</h3>
+            </div>
+            <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty] bg-slate-950 p-4 rounded-xl border border-slate-800">
+              „Sie bereiten Herrn Chen auf seine OP vor. Der gestresste Chirurg kommt ins Patientenzimmer, legt den leeren Aufklärungsbogen auf den Nachttisch und sagt zu Ihnen: <em>'Ich muss sofort in den OP 2, Notfall. Klären Sie Herrn Chen bitte kurz über die Schnittführung auf und lassen Sie ihn hier unterschreiben, sonst fällt sein Termin heute aus.'</em> Notieren Sie roh, was hier rechtlich falsch läuft.“
+            </p>
+
+            <StyledTextarea 
+              label="Ihre Roh-Notizen zur Situation"
+              placeholder="Was läuft hier rechtlich schief? (Arztvorbehalt, Zeitdruck, fehlende Mündlichkeit, Remonstrationspflicht)..."
+              value={case8Notes}
+              onChange={(e: any) => setCase8Notes(e.target.value)}
+              color="rose"
+            />
+          </div>
+
+          {/* Schritt 2: Prompt A */}
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-purple-500 text-white font-black text-xs flex items-center justify-center">2</span>
+              <h3 className="font-bold text-white text-base">Schritt 2: Prompt A – Sokratischer Lern-Dialog</h3>
+            </div>
+            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed [text-wrap:pretty]">
+              Kopieren Sie diesen Prompt in den digitalen KI-Helfer (Google NotebookLM), um sich sokratisch befragen zu lassen:
+            </p>
+
+            <CopyBlock 
+              title="Prompt A: Sokratischer Dialog mit dem KI-Tutor"
+              content={`C: Agiere als Jura-Dozent in der Pflegeausbildung.
+R: Führe einen sokratischen Dialog mit mir. Hilf mir, meine rohen Beobachtungen rechtlich einzuordnen. Schwerpunkt: Ärztliches Delegationsverbot der Aufklärung und meine Remonstrationspflicht.
+A: Stelle nur EINE offene Frage. Gib keine fertigen Lösungen vor. Zwinge mich, die rechtlichen Vorgaben selbst anzuwenden.
+E: Starte den Dialog basierend auf diesen Notizen: ${case8Notes || '[Ihre Notizen aus Schritt 1]'}`}
+              titleColor="text-purple-400"
+            />
+
+            <a 
+              href="https://notebook.google.com/notebook/36294d79-a601-4870-a351-53ab8c954ac3" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white rounded-lg text-xs font-bold transition-colors border border-purple-500/40"
+            >
+              <Bot className="w-4 h-4" /> Zum KI-Helfer in Google NotebookLM
+            </a>
+          </div>
+
+          {/* Schritt 3: Prompt B */}
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-blue-500 text-white font-black text-xs flex items-center justify-center">3</span>
+              <h3 className="font-bold text-white text-base">Schritt 3: Prompt B – Generator für rechtssichere Dokumentation</h3>
+            </div>
+            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed [text-wrap:pretty]">
+              Nutzen Sie diesen Prompt, um Ihre Weigerung (Remonstration) sachlich und gerichtsfest zu formulieren:
+            </p>
+
+            <CopyBlock 
+              title="Prompt B: Rechtssicherer Doku- & CIRS-Generator"
+              content={`C: Agiere als Experte für Pflegedokumentation und Arzthaftung.
+R: Übersetze meine unstrukturierten Beobachtungsnotizen in einen rechtssicheren, sachlichen Dokumentationseintrag oder eine CIRS-Meldung, der meine fachliche Weigerung (Remonstration) belegt.
+A: Absolut sachlich, wertfrei, keine Emotionen. Fokussiere dich auf Fakten, Uhrzeiten und die abgelehnte Delegation.
+E: Meine Notizen: ${case8Notes || '[Ihre Notizen aus Schritt 1]'}`}
+              titleColor="text-blue-400"
+            />
+          </div>
+
+          {/* Schritt 4: Fobizz Transfer */}
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-emerald-500 text-white font-black text-xs flex items-center justify-center">4</span>
+              <h3 className="font-bold text-white text-base">Schritt 4: Fobizz Azubi-Board</h3>
+            </div>
+            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed [text-wrap:pretty]">
+              Kopieren Sie Ihren finalen, rechtssicheren Dokumentationseintrag und posten Sie ihn auf dem digitalen fobizz Azubi-Board:
+            </p>
+
+            <div className="h-96 w-full rounded-xl overflow-hidden border border-slate-700 bg-slate-950">
+              <iframe 
+                src="https://tools.fobizz.com/boards/embed/dc44fa12-32b0-466d-8b43-ce066e409b30" 
+                title="fobizz Azubi-Board" 
+                className="w-full h-full border-0"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CASE 09: RAUM 04 ARZTZIMMER (BEWEISLAST & DOKUMENTATION) */}
+      {caseId === 9 && (
+        <div className="space-y-6">
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+            <span className="px-2.5 py-1 rounded-md bg-rose-500/20 text-rose-400 font-black text-xs uppercase tracking-wider">Raum 04: Arztzimmer</span>
+            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">Akte 09: Beweislast & Dokumentation</h2>
+            <p className="text-slate-300 text-sm mt-2 leading-relaxed [text-wrap:pretty]">
+              Schützen Sie sich und Patient:innen durch rechtssichere Dokumentationsroutinen.
+            </p>
+          </div>
+
+          {/* Szenario */}
+          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3">
+            <h3 className="font-bold text-white text-base">Szenario:</h3>
+            <p className="text-slate-200 text-sm leading-relaxed [text-wrap:pretty] bg-slate-950 p-4 rounded-xl border border-slate-800">
+              „Eine Operation ist handwerklich perfekt verlaufen, doch der Patient klagt auf Schmerzensgeld wegen einer angeblich fehlenden Risikoaufklärung. Es steht Aussage gegen Aussage.“
+            </p>
+
+            <h3 className="font-bold text-white text-base pt-2">Arbeitsauftrag:</h3>
+            <p className="text-slate-300 text-sm leading-relaxed [text-wrap:pretty]">
+              Lesen Sie den In-Game-Auszug zu § 630h BGB. Wer muss in einem Gerichtsprozess beweisen, dass die Aufklärung ordnungsgemäß und rechtzeitig stattgefunden hat? Welche Rolle spielt dabei Ihre Pflegedokumentation?
+            </p>
+
+            {/* In-Game-Reader */}
+            <div className="bg-slate-950 border border-slate-700 p-4 rounded-xl space-y-2">
+              <span className="text-[10px] font-black uppercase tracking-wider text-amber-400">§ 630h BGB (Beweislast bei Haftung für Behandlungs- und Aufklärungsfehler)</span>
+              <p className="text-xs sm:text-sm text-slate-300 font-serif leading-relaxed italic">
+                (2) Der Behandelnde hat zu beweisen, dass er eine Einwilligung gemäß § 630d eingeholt und entsprechend den Anforderungen des § 630e aufgeklärt hat. Genügt die Aufklärung nicht den Anforderungen, kann der Behandelnde sich darauf berufen, dass der Patient auch im Falle einer ordnungsgemäßen Aufklärung in die Maßnahme eingewilligt hätte.
+              </p>
+            </div>
+
+            <StyledTextarea 
+              label="Ihre rechtliche Analyse zur Beweislast"
+              placeholder="Wer trägt die Beweislast? Welche Bedeutung hat die Pflegedokumentation vor Gericht? ('Wer schreibt, der bleibt')..."
+              value={case9Analysis}
+              onChange={(e: any) => setCase9Analysis(e.target.value)}
+              color="rose"
+            />
+
+            <button 
+              onClick={() => setCase9ShowSolution(!case9ShowSolution)}
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-700"
+            >
+              {case9ShowSolution ? 'Musterlösung verbergen' : 'Antwort juristisch auswerten / Musterlösung anzeigen'}
+            </button>
+
+            {case9ShowSolution && (
+              <div className="p-5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 text-xs sm:text-sm text-slate-200 space-y-2 animate-in fade-in">
+                <h5 className="font-black text-emerald-400 uppercase tracking-wider text-xs">Musterlösung:</h5>
+                <p>
+                  <strong>Korrekt analysiert!</strong> In der Arzthaftung gilt die <strong>Beweislastumkehr zugunsten des Patienten</strong>. Das Krankenhaus muss beweisen, dass richtig und rechtzeitig aufgeklärt wurde.
+                </p>
+                <p>
+                  Ihre Pflegedokumentation ist hierbei das wichtigste juristische Schutzschild (<em>„Wer schreibt, der bleibt“</em>). Fehlt die Dokumentation in der Patientenakte, geht das Gericht nach § 630h BGB davon aus, dass die Maßnahme oder Aufklärung <strong>nicht stattgefunden hat</strong>.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
